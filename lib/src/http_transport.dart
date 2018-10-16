@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:http_client/http_client.dart' as http;
 
 import 'transport.dart';
