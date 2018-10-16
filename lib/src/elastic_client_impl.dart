@@ -1,0 +1,186 @@
+import 'dart:async';
+import 'dart:convert' as convert;
+
+import 'transport.dart';
+
+class Doc {
+  final String index;
+  final String type;
+  final String id;
+  final Map doc;
+  final double score;
+
+  Doc(this.id, this.doc, {this.index, this.type, this.score});
+
+  Map toMap() {
+    final map = {
+      '_index': index,
+      '_type': type,
+      '_id': id,
+      '_score': score,
+      'doc': doc,
+    };
+    map.removeWhere((k, v) => v == null);
+    return map;
+  }
+}
+
+class Client {
+  final Transport _transport;
+
+  Client(this._transport);
+
+  Future<bool> indexExists(String index) async {
+    final rs = await _transport.send(new Request('HEAD', [index]));
+    return rs.statusCode == 200;
+  }
+
+  Future updateIndex(String index, Map<String, dynamic> content) async {
+    await _transport.send(new Request('PUT', [index], bodyMap: content));
+  }
+
+  Future flushIndex(String index) async {
+    await _transport.send(new Request('POST', [index, '_flush'],
+        params: {'wait_if_ongoing': 'true'}));
+  }
+
+  Future<bool> deleteIndex(String index) async {
+    final rs = await _transport.send(new Request('DELETE', [index]));
+    return rs.statusCode == 200;
+  }
+
+  Future<bool> updateDoc(
+      String index, String type, String id, Map<String, dynamic> doc) async {
+    final pathSegments = [index, type];
+    if (id != null) pathSegments.add(id);
+    final rs =
+        await _transport.send(new Request('POST', pathSegments, bodyMap: doc));
+    return rs.statusCode == 200 || rs.statusCode == 201;
+  }
+
+  Future<bool> updateDocs(String index, String type, List<Doc> docs,
+      {int batchSize: 100}) async {
+    final pathSegments = [index, type, '_bulk']..removeWhere((v) => v == null);
+    for (int start = 0; start < docs.length;) {
+      final sub = docs.skip(start).take(batchSize).toList();
+      final lines = sub
+          .map((doc) => [
+                {
+                  'index': {
+                    '_index': doc.index,
+                    '_type': doc.type,
+                    '_id': doc.id
+                  }..removeWhere((k, v) => v == null)
+                },
+                doc.doc,
+              ])
+          .expand((list) => list)
+          .map(convert.json.encode)
+          .map((s) => '$s\n')
+          .join();
+      final rs = await _transport
+          .send(new Request('POST', pathSegments, bodyText: lines));
+      if (rs.statusCode != 200) {
+        throw new Exception(
+            'Unable to update batch starting with $start. ${rs.statusCode} ${rs.body}');
+      }
+      start += sub.length;
+    }
+    return true;
+  }
+
+  Future<int> deleteDoc(String index, String type, String id) async {
+    final rs = await _transport.send(new Request('DELETE', [index, type, id]));
+    return rs.statusCode == 200 ? 1 : 0;
+  }
+
+  Future<int> deleteDocs(String index, Map query) async {
+    final rs = await _transport.send(new Request(
+        'POST', [index, '_delete_by_query'],
+        bodyMap: {'query': query}));
+    if (rs.statusCode != 200) return 0;
+    return rs.bodyAsMap['deleted'] as int ?? 0;
+  }
+
+  Future<SearchResult> search(String index, String type, Map query,
+      {int offset, int limit, bool fetchSource: false}) async {
+    final path = [index, type, '_search'];
+    final map = {
+      '_source': fetchSource,
+      'query': query,
+    };
+    if (offset != null) map['from'] = offset;
+    if (limit != null) map['size'] = limit;
+    final rs = await _transport.send(new Request('POST', path,
+        params: {'search_type': 'dfs_query_then_fetch'}, bodyMap: map));
+    if (rs.statusCode != 200) {
+      throw new Exception('Failed to search $query');
+    }
+    final body = convert.json.decode(rs.body);
+    final hitsMap = body['hits'] ?? const {};
+    final int totalCount = hitsMap['total'] ?? 0;
+    final List<Map> hitsList =
+        (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
+    final List<Doc> results = hitsList
+        .map((Map map) => new Doc(map['_id'] as String, map['_source'] as Map,
+            index: map['_index'] as String,
+            type: map['_type'] as String,
+            score: map['_score'] as double))
+        .toList();
+    return new SearchResult(totalCount, results);
+  }
+}
+
+class SearchResult {
+  final int totalCount;
+  final List<Doc> hits;
+
+  SearchResult(this.totalCount, this.hits);
+
+  Map toMap() => {
+        'totalCount': totalCount,
+        'hits': hits.map((h) => h.toMap()).toList(),
+      };
+}
+
+class ElasticDocHit {
+  final String id;
+  final double score;
+
+  ElasticDocHit(this.id, this.score);
+
+  Map toMap() => {'id': id, 'score': score};
+}
+
+abstract class Query {
+  static Map matchAll() => {'match_all': {}};
+
+  static Map matchNone() => {'match_none': {}};
+
+  static Map bool({must, filter, should, mustNot}) {
+    final map = {};
+    if (must != null) map['must'] = must;
+    if (filter != null) map['filter'] = filter;
+    if (should != null) map['should'] = should;
+    if (mustNot != null) map['mustNot'] = mustNot;
+    return {'bool': map};
+  }
+
+  static Map exists(String field) => {
+        'exists': {'field': field}
+      };
+
+  static Map term(String field, List<String> terms) => {
+        'terms': {field: terms}
+      };
+
+  static Map match(String field, String text, {String minimum}) {
+    final Map map = {'query': text};
+    if (minimum != null) {
+      map['minimum_should_match'] = minimum;
+    }
+    return {
+      'match': {field: map}
+    };
+  }
+}
