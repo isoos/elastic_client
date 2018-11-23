@@ -103,14 +103,16 @@ class Client {
   }
 
   Future<SearchResult> search(String index, String type, Map query,
-      {int offset, int limit, bool fetchSource: false}) async {
+      {int offset, int limit, bool fetchSource: false, Map suggest}) async {
     final path = [index, type, '_search'];
     final map = {
       '_source': fetchSource,
       'query': query,
+      'from': offset,
+      'size': limit,
+      'suggest': suggest,
     };
-    if (offset != null) map['from'] = offset;
-    if (limit != null) map['size'] = limit;
+    map.removeWhere((k, v) => v == null);
     final rs = await _transport.send(new Request('POST', path,
         params: {'search_type': 'dfs_query_then_fetch'}, bodyMap: map));
     if (rs.statusCode != 200) {
@@ -122,25 +124,75 @@ class Client {
     final List<Map> hitsList =
         (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
     final List<Doc> results = hitsList
-        .map((Map map) => new Doc(map['_id'] as String, map['_source'] as Map,
-            index: map['_index'] as String,
-            type: map['_type'] as String,
-            score: map['_score'] as double))
+        .map((Map map) => new Doc(
+              map['_id'] as String,
+              map['_source'] as Map,
+              index: map['_index'] as String,
+              type: map['_type'] as String,
+              score: map['_score'] as double,
+            ))
         .toList();
-    return new SearchResult(totalCount, results);
+    final suggestMap = body['suggest'] as Map ?? const {};
+    final suggestHits = suggestMap.map<String, List<SuggestHit>>((k, v) {
+      if (v == null) return null;
+      final list = (v as List).cast<Map>();
+      final hits = list
+          .map((map) {
+            final optionsList = (map['options'] as List).cast<Map>();
+            final options = optionsList?.map((m) {
+              return new SuggestHitOption(
+                m['text'] as String,
+                m['score'] as double,
+                freq: m['freq'] as int,
+                highlighted: m['highlighted'] as String,
+              );
+            })?.toList();
+            return new SuggestHit(
+              map['text'] as String,
+              map['offset'] as int,
+              map['length'] as int,
+              options,
+            );
+          })
+          .where((x) => x != null)
+          .toList();
+      return new MapEntry('', hits);
+    });
+    suggestHits.removeWhere((k, v) => v == null);
+    return new SearchResult(totalCount, results,
+        suggestHits: suggestHits.isEmpty ? null : suggestHits);
   }
 }
 
 class SearchResult {
   final int totalCount;
   final List<Doc> hits;
+  final Map<String, List<SuggestHit>> suggestHits;
 
-  SearchResult(this.totalCount, this.hits);
+  SearchResult(this.totalCount, this.hits, {this.suggestHits});
 
   Map toMap() => {
         'totalCount': totalCount,
         'hits': hits.map((h) => h.toMap()).toList(),
       };
+}
+
+class SuggestHit {
+  final String text;
+  final int offset;
+  final int length;
+  final List<SuggestHitOption> options;
+
+  SuggestHit(this.text, this.offset, this.length, this.options);
+}
+
+class SuggestHitOption {
+  final String text;
+  final double score;
+  final int freq;
+  final String highlighted;
+
+  SuggestHitOption(this.text, this.score, {this.freq, this.highlighted});
 }
 
 class ElasticDocHit {
