@@ -120,7 +120,7 @@ class Client {
     }
     final body = convert.json.decode(rs.body);
     final hitsMap = body['hits'] ?? const {};
-    final int totalCount = hitsMap['total'] ?? 0;
+    final int totalCount = (hitsMap['total'] as int) ?? 0;
     final List<Map> hitsList =
         (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
     final List<Doc> results = hitsList

@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Upgrade `http_client` dependency.
+
 ## 0.1.2
 
 - `BasicAuth` option for `HttpTransport`.
