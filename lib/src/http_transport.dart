@@ -38,8 +38,12 @@ class HttpTransport implements Transport {
   }
 
   Map<String, String> _mergeHeader(Map<String, String> headerToMerge) {
-    return _basicAuth == null ? headerToMerge : Map.from(_basicAuth.toMap())
-      ..addAll(headerToMerge);
+    if (_basicAuth != null) {
+      Map<String, String> headers = Map<String, String>.from(_basicAuth.toMap());
+      headers.addAll(headerToMerge);
+      return headers;
+    }
+    return headerToMerge;
   }
 }
 
