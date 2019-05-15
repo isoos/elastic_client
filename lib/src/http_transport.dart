@@ -13,7 +13,7 @@ class HttpTransport implements Transport {
   final BasicAuth _basicAuth;
 
   HttpTransport(this._httpClient, this._uri,
-      {Duration timeout: const Duration(minutes: 1), BasicAuth basicAuth})
+      {Duration timeout = const Duration(minutes: 1), BasicAuth basicAuth})
       : _timeout = timeout,
         _basicAuth = basicAuth;
 
@@ -39,7 +39,8 @@ class HttpTransport implements Transport {
 
   Map<String, String> _mergeHeader(Map<String, String> headerToMerge) {
     if (_basicAuth != null) {
-      Map<String, String> headers = Map<String, String>.from(_basicAuth.toMap());
+      Map<String, String> headers =
+          Map<String, String>.from(_basicAuth.toMap());
       headers.addAll(headerToMerge);
       return headers;
     }

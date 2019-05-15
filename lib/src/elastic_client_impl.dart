@@ -59,7 +59,7 @@ class Client {
   }
 
   Future<bool> updateDocs(String index, String type, List<Doc> docs,
-      {int batchSize: 100}) async {
+      {int batchSize = 100}) async {
     final pathSegments = [index, type, '_bulk']..removeWhere((v) => v == null);
     for (int start = 0; start < docs.length;) {
       final sub = docs.skip(start).take(batchSize).toList();
@@ -103,7 +103,7 @@ class Client {
   }
 
   Future<SearchResult> search(String index, String type, Map query,
-      {int offset, int limit, bool fetchSource: false, Map suggest}) async {
+      {int offset, int limit, bool fetchSource = false, Map suggest}) async {
     final path = [index, type, '_search'];
     final map = {
       '_source': fetchSource,
