@@ -102,15 +102,16 @@ class Client {
     return rs.bodyAsMap['deleted'] as int ?? 0;
   }
 
-  Future<SearchResult> search(String index, String type, Map query,
-      {int offset, int limit, bool fetchSource = false, Map suggest}) async {
+  Future<SearchResult> search(String index, String type, Map<String, dynamic> query,
+      {int offset, int limit, bool fetchSource = false, Map suggest, Map aggs, bool rawQuery = false}) async {
     final path = [index, type, '_search'];
-    final map = {
+    final map = rawQuery ? query: {
       '_source': fetchSource,
       'query': query,
       'from': offset,
       'size': limit,
       'suggest': suggest,
+      'aggs' : aggs
     };
     map.removeWhere((k, v) => v == null);
     final rs = await _transport.send(new Request('POST', path,
