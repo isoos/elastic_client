@@ -206,11 +206,11 @@ class ElasticDocHit {
 }
 
 abstract class Query {
-  static Map matchAll() => {'match_all': {}};
+  static Map<String, dynamic> matchAll() => {'match_all': {}};
 
-  static Map matchNone() => {'match_none': {}};
+  static Map<String, dynamic> matchNone() => {'match_none': {}};
 
-  static Map bool({must, filter, should, mustNot}) {
+  static Map<String, dynamic> bool({must, filter, should, mustNot}) {
     final map = {};
     if (must != null) map['must'] = must;
     if (filter != null) map['filter'] = filter;
@@ -219,15 +219,15 @@ abstract class Query {
     return {'bool': map};
   }
 
-  static Map exists(String field) => {
+  static Map<String, dynamic> exists(String field) => {
         'exists': {'field': field}
       };
 
-  static Map term(String field, List<String> terms) => {
+  static Map<String, dynamic> term(String field, List<String> terms) => {
         'terms': {field: terms}
       };
 
-  static Map match(String field, String text, {String minimum}) {
+  static Map<String, dynamic> match(String field, String text, {String minimum}) {
     final Map map = {'query': text};
     if (minimum != null) {
       map['minimum_should_match'] = minimum;
