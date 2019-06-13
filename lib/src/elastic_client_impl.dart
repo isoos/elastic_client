@@ -40,8 +40,7 @@ class Client {
   }
 
   Future flushIndex(String index) async {
-    await _transport.send(new Request('POST', [index, '_flush'],
-        params: {'wait_if_ongoing': 'true'}));
+    await _transport.send(new Request('POST', [index, '_flush'], params: {'wait_if_ongoing': 'true'}));
   }
 
   Future<bool> deleteIndex(String index) async {
@@ -49,28 +48,21 @@ class Client {
     return rs.statusCode == 200;
   }
 
-  Future<bool> updateDoc(
-      String index, String type, String id, Map<String, dynamic> doc) async {
+  Future<bool> updateDoc(String index, String type, String id, Map<String, dynamic> doc) async {
     final pathSegments = [index, type];
     if (id != null) pathSegments.add(id);
-    final rs =
-        await _transport.send(new Request('POST', pathSegments, bodyMap: doc));
+    final rs = await _transport.send(new Request('POST', pathSegments, bodyMap: doc));
     return rs.statusCode == 200 || rs.statusCode == 201;
   }
 
-  Future<bool> updateDocs(String index, String type, List<Doc> docs,
-      {int batchSize = 100}) async {
+  Future<bool> updateDocs(String index, String type, List<Doc> docs, {int batchSize = 100}) async {
     final pathSegments = [index, type, '_bulk']..removeWhere((v) => v == null);
     for (int start = 0; start < docs.length;) {
       final sub = docs.skip(start).take(batchSize).toList();
       final lines = sub
           .map((doc) => [
                 {
-                  'index': {
-                    '_index': doc.index,
-                    '_type': doc.type,
-                    '_id': doc.id
-                  }..removeWhere((k, v) => v == null)
+                  'index': {'_index': doc.index, '_type': doc.type, '_id': doc.id}..removeWhere((k, v) => v == null)
                 },
                 doc.doc,
               ])
@@ -78,11 +70,9 @@ class Client {
           .map(convert.json.encode)
           .map((s) => '$s\n')
           .join();
-      final rs = await _transport
-          .send(new Request('POST', pathSegments, bodyText: lines));
+      final rs = await _transport.send(new Request('POST', pathSegments, bodyText: lines));
       if (rs.statusCode != 200) {
-        throw new Exception(
-            'Unable to update batch starting with $start. ${rs.statusCode} ${rs.body}');
+        throw new Exception('Unable to update batch starting with $start. ${rs.statusCode} ${rs.body}');
       }
       start += sub.length;
     }
@@ -95,9 +85,7 @@ class Client {
   }
 
   Future<int> deleteDocs(String index, Map query) async {
-    final rs = await _transport.send(new Request(
-        'POST', [index, '_delete_by_query'],
-        bodyMap: {'query': query}));
+    final rs = await _transport.send(new Request('POST', [index, '_delete_by_query'], bodyMap: {'query': query}));
     if (rs.statusCode != 200) return 0;
     return rs.bodyAsMap['deleted'] as int ?? 0;
   }
@@ -105,25 +93,23 @@ class Client {
   Future<SearchResult> search(String index, String type, Map<String, dynamic> query,
       {int offset, int limit, bool fetchSource = false, Map suggest, Map aggs, bool rawQuery = false}) async {
     final path = [index, type, '_search'];
-    final map = rawQuery ? query: {
-      '_source': fetchSource,
-      'query': query,
-      'from': offset,
-      'size': limit,
-      'suggest': suggest,
-      'aggs' : aggs
-    };
+    final map =
+        rawQuery ? query : {'_source': fetchSource, 'query': query, 'from': offset, 'size': limit, 'suggest': suggest, 'aggs': aggs};
     map.removeWhere((k, v) => v == null);
-    final rs = await _transport.send(new Request('POST', path,
-        params: {'search_type': 'dfs_query_then_fetch'}, bodyMap: map));
+    final rs = await _transport.send(new Request('POST', path, params: {'search_type': 'dfs_query_then_fetch'}, bodyMap: map));
     if (rs.statusCode != 200) {
       throw new Exception('Failed to search $query');
     }
     final body = convert.json.decode(rs.body);
     final hitsMap = body['hits'] ?? const {};
-    final int totalCount = (hitsMap['total'] as int) ?? 0;
-    final List<Map> hitsList =
-        (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
+    int totalCount = 0;
+    if (hitsMap['total'] is Map) {
+      totalCount = hitsMap['total']['value'] as int;
+    } else {
+      totalCount = (hitsMap['total'] as int) ?? 0;
+    }
+
+    final List<Map> hitsList = (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
     final List<Doc> results = hitsList
         .map((Map map) => new Doc(
               map['_id'] as String,
@@ -160,8 +146,7 @@ class Client {
       return new MapEntry('', hits);
     });
     suggestHits.removeWhere((k, v) => v == null);
-    return new SearchResult(totalCount, results,
-        suggestHits: suggestHits.isEmpty ? null : suggestHits);
+    return new SearchResult(totalCount, results, body['aggregations'] as Map, suggestHits: suggestHits.isEmpty ? null : suggestHits);
   }
 }
 
@@ -169,12 +154,14 @@ class SearchResult {
   final int totalCount;
   final List<Doc> hits;
   final Map<String, List<SuggestHit>> suggestHits;
+  final Map aggregations;
 
-  SearchResult(this.totalCount, this.hits, {this.suggestHits});
+  SearchResult(this.totalCount, this.hits, this.aggregations, {this.suggestHits});
 
   Map toMap() => {
         'totalCount': totalCount,
         'hits': hits.map((h) => h.toMap()).toList(),
+        'aggregations': aggregations,
       };
 }
 
