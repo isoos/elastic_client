@@ -103,10 +103,14 @@ class Client {
   }
 
   Future<SearchResult> search(String index, String type, Map query,
-      {int offset, int limit, bool fetchSource = false, Map suggest}) async {
+      {int offset,
+      int limit,
+      @Deprecated("Use 'source' instead") bool fetchSource = false,
+      dynamic source,
+      Map suggest}) async {
     final path = [index, type, '_search'];
     final map = {
-      '_source': fetchSource,
+      '_source': source ?? fetchSource,
       'query': query,
       'from': offset,
       'size': limit,
