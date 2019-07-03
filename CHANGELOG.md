@@ -2,6 +2,7 @@
 
 - Add dynamic `source` param for Client.search() method. This is a replacement for the boolean `fetchSource` to allow _source to be a boolean, a string or a list of strings as per the Elasticsearch spec.
 - Deprecate `fetchSource` param in the Client.search() method.
+- Support sorting of search results.
 
 ## 0.1.4
 
