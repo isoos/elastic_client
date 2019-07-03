@@ -9,8 +9,9 @@ class Doc {
   final String id;
   final Map doc;
   final double score;
+  final List<dynamic> sort;
 
-  Doc(this.id, this.doc, {this.index, this.type, this.score});
+  Doc(this.id, this.doc, {this.index, this.type, this.score, this.sort});
 
   Map toMap() {
     final map = {
@@ -19,6 +20,7 @@ class Doc {
       '_id': id,
       '_score': score,
       'doc': doc,
+      'sort': sort,
     };
     map.removeWhere((k, v) => v == null);
     return map;
@@ -107,7 +109,8 @@ class Client {
       int limit,
       @Deprecated("Use 'source' instead") bool fetchSource = false,
       dynamic source,
-      Map suggest}) async {
+      Map suggest,
+      List<Map> sort}) async {
     final path = [index, type, '_search'];
     final map = {
       '_source': source ?? fetchSource,
@@ -115,6 +118,7 @@ class Client {
       'from': offset,
       'size': limit,
       'suggest': suggest,
+      'sort': sort,
     };
     map.removeWhere((k, v) => v == null);
     final rs = await _transport.send(new Request('POST', path,
@@ -134,6 +138,7 @@ class Client {
               index: map['_index'] as String,
               type: map['_type'] as String,
               score: map['_score'] as double,
+              sort: map['sort'] as List<dynamic>,
             ))
         .toList();
     final suggestMap = body['suggest'] as Map ?? const {};
