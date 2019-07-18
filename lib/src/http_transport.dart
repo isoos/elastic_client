@@ -19,8 +19,11 @@ class HttpTransport implements Transport {
 
   @override
   Future<Response> send(Request request) async {
+    final pathSegments = <String>[]
+      ..addAll(_uri.pathSegments ?? const <String>[])
+      ..addAll(request.pathSegments ?? const <String>[]);
     final newUri = _uri.replace(
-        pathSegments: request.pathSegments, queryParameters: request.params);
+        pathSegments: pathSegments, queryParameters: request.params);
     final rs = await _httpClient
         .send(new http.Request(
           request.method,

@@ -1,3 +1,7 @@
+## 0.1.6
+
+- Fix HTTP transport: preserve original uri's relative path segments.
+
 ## 0.1.5
 
 - Add dynamic `source` param for Client.search() method. This is a replacement for the boolean `fetchSource` to allow _source to be a boolean, a string or a list of strings as per the Elasticsearch spec.
