@@ -1,3 +1,7 @@
+## 0.1.8
+
+- `Query.prefix`
+
 ## 0.1.7
 
 - Handle `'hits': {'total': {'value': 1}}}` in the search response format.

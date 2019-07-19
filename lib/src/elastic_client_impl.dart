@@ -241,6 +241,10 @@ abstract class Query {
         'terms': {field: terms}
       };
 
+  static Map prefix(String field, String value) => {
+        'prefix': {field: value},
+      };
+
   static Map match(String field, String text, {String minimum}) {
     final Map map = {'query': text};
     if (minimum != null) {
