@@ -128,7 +128,13 @@ class Client {
     }
     final body = convert.json.decode(rs.body);
     final hitsMap = body['hits'] ?? const {};
-    final int totalCount = (hitsMap['total'] as int) ?? 0;
+    final hitsTotal = hitsMap['total'];
+    int totalCount = 0;
+    if (hitsTotal is int) {
+      totalCount = hitsTotal;
+    } else if (hitsTotal is Map) {
+      totalCount = (hitsTotal['value'] as int) ?? 0;
+    }
     final List<Map> hitsList =
         (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
     final List<Doc> results = hitsList

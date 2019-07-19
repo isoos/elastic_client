@@ -1,3 +1,7 @@
+## 0.1.7
+
+- Handle `'hits': {'total': {'value': 1}}}` in the search response format.
+
 ## 0.1.6
 
 - Fix HTTP transport: preserve original uri's relative path segments.
