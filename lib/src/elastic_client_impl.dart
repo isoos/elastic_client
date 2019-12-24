@@ -183,10 +183,9 @@ class Client {
 
     final aggMap = body['aggregations'] as Map<String, dynamic> ?? const {};
     final aggResult = aggMap.map<String, Aggregation>((k, v) {
-      return MapEntry(
-          k,
-          Aggregation(k, aggregations[k] as Map<String, dynamic>,
-              v as Map<String, dynamic>));
+      final agg = Aggregation(k, aggregations[k] as Map<String, dynamic>,
+          v as Map<String, dynamic>);
+      return MapEntry(k, agg);
     });
 
     return new SearchResult(
@@ -265,15 +264,15 @@ class Aggregation {
 
   Aggregation(String name, Map<String, dynamic> param, Map<String, dynamic> m) {
     this.name = name;
-    this.value = m['value'];
-    this.values = m['values'] as Map;
-    this.docCountErrorUpperBound = m['doc_count_error_upper_bound'] as int;
-    this.sumOtherDocCount = m['sum_other_doc_count'] as int;
+    value = m['value'];
+    values = m['values'] as Map;
+    docCountErrorUpperBound = m['doc_count_error_upper_bound'] as int;
+    sumOtherDocCount = m['sum_other_doc_count'] as int;
 
     final hitsMap = m['hits'] ?? const {};
-    final List<Map> hitsList =
+    final hitsList =
         ((hitsMap['hits'] ?? []) as List).cast<Map>() ?? const <Map>[];
-    this.hits = hitsList
+    final hits = hitsList
         .map((map) => new Doc(
               map['_id'] as String,
               map['_source'] as Map,
@@ -283,6 +282,7 @@ class Aggregation {
               sort: map['sort'] as List<dynamic>,
             ))
         .toList();
+    this.hits = hits.isEmpty ? null : hits;
 
     final bucketMapList = ((m['buckets'] ?? []) as List).cast<Map>() ?? <Map>[];
     final buckets = bucketMapList.map<Bucket>((bucketMap) {
