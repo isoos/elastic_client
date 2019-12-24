@@ -249,6 +249,20 @@ class Aggregation {
   List<Doc> hits;
   List<Bucket> buckets;
 
+  Map toMap() {
+    final map = {
+      'name': name,
+      'value': value,
+      'values': values,
+      'docCountErrorUpperBound': docCountErrorUpperBound,
+      'sumOtherDocCount': sumOtherDocCount,
+      'hits': hits?.map((i) => i.toMap()),
+      'buckets': buckets?.map((i) => i.toMap()),
+    };
+    map.removeWhere((k, v) => v == null);
+    return map;
+  }
+
   Aggregation(String name, Map<String, dynamic> param, Map<String, dynamic> m) {
     this.name = name;
     this.value = m['value'];
@@ -292,6 +306,16 @@ class Bucket {
   dynamic key;
   int docCount;
   Map<String, Aggregation> aggregations;
+
+  Map toMap() {
+    final map = {
+      'key': key,
+      'docCount': docCount,
+      'aggregations': aggregations?.map((k, v) => MapEntry(k, v.toMap())),
+    };
+    map.removeWhere((k, v) => v == null);
+    return map;
+  }
 }
 
 abstract class Query {
