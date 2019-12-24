@@ -242,6 +242,8 @@ class ElasticDocHit {
 
 class Aggregation {
   String name;
+  dynamic value;
+  Map values;
   int docCountErrorUpperBound;
   int sumOtherDocCount;
   List<Doc> hits;
@@ -249,6 +251,8 @@ class Aggregation {
 
   Aggregation(String name, Map<String, dynamic> param, Map<String, dynamic> m) {
     this.name = name;
+    this.value = m['value'];
+    this.values = m['values'] as Map;
     this.docCountErrorUpperBound = m['doc_count_error_upper_bound'] as int;
     this.sumOtherDocCount = m['sum_other_doc_count'] as int;
 
