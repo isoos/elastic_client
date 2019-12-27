@@ -104,13 +104,18 @@ class Client {
     return rs.bodyAsMap['deleted'] as int ?? 0;
   }
 
-  Future<SearchResult> search(String index, String type, Map query,
-      {int offset,
-      int limit,
-      @Deprecated("Use 'source' instead") bool fetchSource = false,
-      dynamic source,
-      Map suggest,
-      List<Map> sort}) async {
+  Future<SearchResult> search(
+    String index,
+    String type,
+    Map query, {
+    int offset,
+    int limit,
+    @Deprecated("Use 'source' instead") bool fetchSource = false,
+    dynamic source,
+    Map suggest,
+    List<Map> sort,
+    Map aggregations,
+  }) async {
     final path = [index, type, '_search'];
     final map = {
       '_source': source ?? fetchSource,
@@ -119,6 +124,7 @@ class Client {
       'size': limit,
       'suggest': suggest,
       'sort': sort,
+      'aggregations': aggregations,
     };
     map.removeWhere((k, v) => v == null);
     final rs = await _transport.send(new Request('POST', path,
@@ -174,8 +180,20 @@ class Client {
       return new MapEntry('', hits);
     });
     suggestHits.removeWhere((k, v) => v == null);
-    return new SearchResult(totalCount, results,
-        suggestHits: suggestHits.isEmpty ? null : suggestHits);
+
+    final aggMap = body['aggregations'] as Map<String, dynamic> ?? const {};
+    final aggResult = aggMap.map<String, Aggregation>((k, v) {
+      final agg = Aggregation(k, aggregations[k] as Map<String, dynamic>,
+          v as Map<String, dynamic>);
+      return MapEntry(k, agg);
+    });
+
+    return new SearchResult(
+      totalCount,
+      results,
+      suggestHits: suggestHits.isEmpty ? null : suggestHits,
+      aggregations: aggResult.isEmpty ? null : aggResult,
+    );
   }
 }
 
@@ -183,8 +201,10 @@ class SearchResult {
   final int totalCount;
   final List<Doc> hits;
   final Map<String, List<SuggestHit>> suggestHits;
+  final Map<String, Aggregation> aggregations;
 
-  SearchResult(this.totalCount, this.hits, {this.suggestHits});
+  SearchResult(this.totalCount, this.hits,
+      {this.suggestHits, this.aggregations});
 
   Map toMap() => {
         'totalCount': totalCount,
@@ -217,6 +237,85 @@ class ElasticDocHit {
   ElasticDocHit(this.id, this.score);
 
   Map toMap() => {'id': id, 'score': score};
+}
+
+class Aggregation {
+  String name;
+  dynamic value;
+  Map values;
+  int docCountErrorUpperBound;
+  int sumOtherDocCount;
+  List<Doc> hits;
+  List<Bucket> buckets;
+
+  Map toMap() {
+    final map = {
+      'name': name,
+      'value': value,
+      'values': values,
+      'docCountErrorUpperBound': docCountErrorUpperBound,
+      'sumOtherDocCount': sumOtherDocCount,
+      'hits': hits?.map((i) => i.toMap()),
+      'buckets': buckets?.map((i) => i.toMap()),
+    };
+    map.removeWhere((k, v) => v == null);
+    return map;
+  }
+
+  Aggregation(String name, Map<String, dynamic> param, Map<String, dynamic> m) {
+    this.name = name;
+    value = m['value'];
+    values = m['values'] as Map;
+    docCountErrorUpperBound = m['doc_count_error_upper_bound'] as int;
+    sumOtherDocCount = m['sum_other_doc_count'] as int;
+
+    final hitsMap = m['hits'] ?? const {};
+    final hitsList =
+        ((hitsMap['hits'] ?? []) as List).cast<Map>() ?? const <Map>[];
+    final hits = hitsList
+        .map((map) => new Doc(
+              map['_id'] as String,
+              map['_source'] as Map,
+              index: map['_index'] as String,
+              type: map['_type'] as String,
+              score: map['_score'] as double,
+              sort: map['sort'] as List<dynamic>,
+            ))
+        .toList();
+    this.hits = hits.isEmpty ? null : hits;
+
+    final bucketMapList = ((m['buckets'] ?? []) as List).cast<Map>() ?? <Map>[];
+    final buckets = bucketMapList.map<Bucket>((bucketMap) {
+      Bucket bucket = Bucket()
+        ..key = bucketMap['key']
+        ..docCount = bucketMap['doc_count'] as int;
+      final aggMap = param['aggs'] as Map<String, dynamic> ?? const {};
+      final aggs = aggMap.map<String, Aggregation>((subName, subParam) {
+        final subMap = bucketMap[subName] as Map<String, dynamic>;
+        return MapEntry(subName,
+            Aggregation(subName, subParam as Map<String, dynamic>, subMap));
+      });
+      bucket.aggregations = aggs.isEmpty ? null : aggs;
+      return bucket;
+    }).toList();
+    this.buckets = buckets.isEmpty ? null : buckets;
+  }
+}
+
+class Bucket {
+  dynamic key;
+  int docCount;
+  Map<String, Aggregation> aggregations;
+
+  Map toMap() {
+    final map = {
+      'key': key,
+      'docCount': docCount,
+      'aggregations': aggregations?.map((k, v) => MapEntry(k, v.toMap())),
+    };
+    map.removeWhere((k, v) => v == null);
+    return map;
+  }
 }
 
 abstract class Query {
