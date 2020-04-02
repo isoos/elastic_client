@@ -33,21 +33,21 @@ class Client {
   Client(this._transport);
 
   Future<bool> indexExists(String index) async {
-    final rs = await _transport.send(new Request('HEAD', [index]));
+    final rs = await _transport.send(Request('HEAD', [index]));
     return rs.statusCode == 200;
   }
 
   Future updateIndex(String index, Map<String, dynamic> content) async {
-    await _transport.send(new Request('PUT', [index], bodyMap: content));
+    await _transport.send(Request('PUT', [index], bodyMap: content));
   }
 
   Future flushIndex(String index) async {
-    await _transport.send(new Request('POST', [index, '_flush'],
+    await _transport.send(Request('POST', [index, '_flush'],
         params: {'wait_if_ongoing': 'true'}));
   }
 
   Future<bool> deleteIndex(String index) async {
-    final rs = await _transport.send(new Request('DELETE', [index]));
+    final rs = await _transport.send(Request('DELETE', [index]));
     return rs.statusCode == 200;
   }
 
@@ -56,14 +56,14 @@ class Client {
     final pathSegments = [index, type];
     if (id != null) pathSegments.add(id);
     final rs =
-        await _transport.send(new Request('POST', pathSegments, bodyMap: doc));
+        await _transport.send(Request('POST', pathSegments, bodyMap: doc));
     return rs.statusCode == 200 || rs.statusCode == 201;
   }
 
   Future<bool> updateDocs(String index, String type, List<Doc> docs,
       {int batchSize = 100}) async {
     final pathSegments = [index, type, '_bulk']..removeWhere((v) => v == null);
-    for (int start = 0; start < docs.length;) {
+    for (var start = 0; start < docs.length;) {
       final sub = docs.skip(start).take(batchSize).toList();
       final lines = sub
           .map((doc) => [
@@ -80,10 +80,10 @@ class Client {
           .map(convert.json.encode)
           .map((s) => '$s\n')
           .join();
-      final rs = await _transport
-          .send(new Request('POST', pathSegments, bodyText: lines));
+      final rs =
+          await _transport.send(Request('POST', pathSegments, bodyText: lines));
       if (rs.statusCode != 200) {
-        throw new Exception(
+        throw Exception(
             'Unable to update batch starting with $start. ${rs.statusCode} ${rs.body}');
       }
       start += sub.length;
@@ -92,12 +92,12 @@ class Client {
   }
 
   Future<int> deleteDoc(String index, String type, String id) async {
-    final rs = await _transport.send(new Request('DELETE', [index, type, id]));
+    final rs = await _transport.send(Request('DELETE', [index, type, id]));
     return rs.statusCode == 200 ? 1 : 0;
   }
 
   Future<int> deleteDocs(String index, Map query) async {
-    final rs = await _transport.send(new Request(
+    final rs = await _transport.send(Request(
         'POST', [index, '_delete_by_query'],
         bodyMap: {'query': query}));
     if (rs.statusCode != 200) return 0;
@@ -127,24 +127,23 @@ class Client {
       'aggregations': aggregations,
     };
     map.removeWhere((k, v) => v == null);
-    final rs = await _transport.send(new Request('POST', path,
+    final rs = await _transport.send(Request('POST', path,
         params: {'search_type': 'dfs_query_then_fetch'}, bodyMap: map));
     if (rs.statusCode != 200) {
-      throw new Exception('Failed to search $query');
+      throw Exception('Failed to search $query');
     }
     final body = convert.json.decode(rs.body);
     final hitsMap = body['hits'] ?? const {};
     final hitsTotal = hitsMap['total'];
-    int totalCount = 0;
+    var totalCount = 0;
     if (hitsTotal is int) {
       totalCount = hitsTotal;
     } else if (hitsTotal is Map) {
       totalCount = (hitsTotal['value'] as int) ?? 0;
     }
-    final List<Map> hitsList =
-        (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
-    final List<Doc> results = hitsList
-        .map((Map map) => new Doc(
+    final hitsList = (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
+    final results = hitsList
+        .map((Map map) => Doc(
               map['_id'] as String,
               map['_source'] as Map,
               index: map['_index'] as String,
@@ -161,14 +160,14 @@ class Client {
           .map((map) {
             final optionsList = (map['options'] as List).cast<Map>();
             final options = optionsList?.map((m) {
-              return new SuggestHitOption(
+              return SuggestHitOption(
                 m['text'] as String,
                 m['score'] as double,
                 freq: m['freq'] as int,
                 highlighted: m['highlighted'] as String,
               );
             })?.toList();
-            return new SuggestHit(
+            return SuggestHit(
               map['text'] as String,
               map['offset'] as int,
               map['length'] as int,
@@ -177,7 +176,7 @@ class Client {
           })
           .where((x) => x != null)
           .toList();
-      return new MapEntry('', hits);
+      return MapEntry('', hits);
     });
     suggestHits.removeWhere((k, v) => v == null);
 
@@ -188,7 +187,7 @@ class Client {
       return MapEntry(k, agg);
     });
 
-    return new SearchResult(
+    return SearchResult(
       totalCount,
       results,
       suggestHits: suggestHits.isEmpty ? null : suggestHits,
@@ -273,7 +272,7 @@ class Aggregation {
     final hitsList =
         ((hitsMap['hits'] ?? []) as List).cast<Map>() ?? const <Map>[];
     final hits = hitsList
-        .map((map) => new Doc(
+        .map((map) => Doc(
               map['_id'] as String,
               map['_source'] as Map,
               index: map['_index'] as String,
@@ -286,7 +285,7 @@ class Aggregation {
 
     final bucketMapList = ((m['buckets'] ?? []) as List).cast<Map>() ?? <Map>[];
     final buckets = bucketMapList.map<Bucket>((bucketMap) {
-      Bucket bucket = Bucket()
+      final bucket = Bucket()
         ..key = bucketMap['key']
         ..docCount = bucketMap['doc_count'] as int;
       final aggMap = param['aggs'] as Map<String, dynamic> ?? const {};
@@ -345,7 +344,7 @@ abstract class Query {
       };
 
   static Map match(String field, String text, {String minimum}) {
-    final Map map = {'query': text};
+    final map = {'query': text};
     if (minimum != null) {
       map['minimum_should_match'] = minimum;
     }

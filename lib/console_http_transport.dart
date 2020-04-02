@@ -7,5 +7,5 @@ export 'elastic_client.dart';
 
 class ConsoleHttpTransport extends HttpTransport {
   ConsoleHttpTransport(Uri uri, {BasicAuth basicAuth})
-      : super(new ConsoleClient(), uri, basicAuth: basicAuth);
+      : super(ConsoleClient(), uri, basicAuth: basicAuth);
 }

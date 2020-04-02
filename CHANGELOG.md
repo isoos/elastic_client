@@ -1,3 +1,7 @@
+## 0.1.10
+
+- Updated code to latest Dart style guides.
+
 ## 0.1.9
 
 - Typed aggregations ([#13](https://github.com/isoos/elastic_client/pull/13) by [swdyh](https://github.com/swdyh)).

@@ -26,7 +26,7 @@ class Request {
     bodyText ??= bodyMap == null ? null : convert.json.encode(bodyMap);
     final headers =
         bodyText == null ? null : {'Content-Type': 'application/json'};
-    return new Request._(method, pathSegments, bodyText, headers, params);
+    return Request._(method, pathSegments, bodyText, headers, params);
   }
 }
 

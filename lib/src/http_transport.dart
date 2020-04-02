@@ -19,20 +19,21 @@ class HttpTransport implements Transport {
 
   @override
   Future<Response> send(Request request) async {
-    final pathSegments = <String>[]
-      ..addAll(_uri.pathSegments ?? const <String>[])
-      ..addAll(request.pathSegments ?? const <String>[]);
+    final pathSegments = <String>[
+      ...?_uri.pathSegments,
+      ...?request.pathSegments,
+    ];
     final newUri = _uri.replace(
         pathSegments: pathSegments, queryParameters: request.params);
     final rs = await _httpClient
-        .send(new http.Request(
+        .send(http.Request(
           request.method,
           newUri,
           headers: _mergeHeader(request.headers),
           body: request.bodyText,
         ))
         .timeout(_timeout);
-    return new Response(rs.statusCode, await rs.readAsString());
+    return Response(rs.statusCode, await rs.readAsString());
   }
 
   @override
@@ -42,8 +43,7 @@ class HttpTransport implements Transport {
 
   Map<String, String> _mergeHeader(Map<String, String> headerToMerge) {
     if (_basicAuth != null) {
-      Map<String, String> headers =
-          Map<String, String>.from(_basicAuth.toMap());
+      final headers = Map<String, String>.from(_basicAuth.toMap());
       headers.addAll(headerToMerge);
       return headers;
     }
