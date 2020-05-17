@@ -52,9 +52,11 @@ class Client {
   }
 
   Future<bool> updateDoc(
-      String index, String type, String id, Map<String, dynamic> doc) async {
+      String index, String type, String id, Map<String, dynamic> doc,
+      {bool merge = false}) async {
     final pathSegments = [index, type];
     if (id != null) pathSegments.add(id);
+    if (merge) pathSegments.add('_update');
     final rs =
         await _transport.send(Request('POST', pathSegments, bodyMap: doc));
     return rs.statusCode == 200 || rs.statusCode == 201;
