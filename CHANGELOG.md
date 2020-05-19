@@ -1,3 +1,7 @@
+## 0.1.11
+
+- Enabled merging documents with `updateDoc` ([#19](https://github.com/isoos/elastic_client/pull/19) by [jodinathan](https://github.com/jodinathan)).
+
 ## 0.1.10
 
 - Updated code to latest Dart style guides.
