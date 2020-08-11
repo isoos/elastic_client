@@ -32,5 +32,12 @@ Future<void> main() async {
       ]);
   print(rs2.toMap());
 
+  await client.addAlias('my_index', 'my_index_alias');
+  await client.updateDoc('my_second_index', 'my_type', 'my_id_1',
+      {'some': 'data', 'name': 'Alice', 'distance': 10});
+  await client.swapAlias(
+      alias: 'my_index_alias', from: 'my_index', to: 'my_second_index');
+  await client.removeAlias('my_second_index', 'my_index_alias');
+
   await transport.close();
 }
