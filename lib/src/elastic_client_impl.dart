@@ -51,6 +51,51 @@ class Client {
     return rs.statusCode == 200;
   }
 
+  Future<bool> addAlias(String index, String alias) async {
+    final requestBody = {
+      'actions': [
+        {
+          'add': {'index': index, 'alias': alias}
+        }
+      ]
+    };
+    final rs = await _transport.send(
+      Request('POST', ['_aliases'], bodyMap: requestBody),
+    );
+    return rs.statusCode == 200;
+  }
+
+  Future<bool> removeAlias(String index, String alias) async {
+    final requestBody = {
+      'actions': [
+        {
+          'remove': {'index': index, 'alias': alias}
+        }
+      ]
+    };
+    final rs = await _transport.send(
+      Request('POST', ['_aliases'], bodyMap: requestBody),
+    );
+    return rs.statusCode == 200;
+  }
+
+  Future<bool> swapAlias({String alias, String from, String to}) async {
+    final requestBody = {
+      'actions': [
+        {
+          'remove': {'index': from, 'alias': alias}
+        },
+        {
+          'add': {'index': to, 'alias': alias}
+        }
+      ]
+    };
+    final rs = await _transport.send(
+      Request('POST', ['_aliases'], bodyMap: requestBody),
+    );
+    return rs.statusCode == 200;
+  }
+
   Future<bool> updateDoc(
       String index, String type, String id, Map<String, dynamic> doc,
       {bool merge = false}) async {
