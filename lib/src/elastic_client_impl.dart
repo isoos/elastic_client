@@ -52,8 +52,13 @@ class Client {
   }
 
   Future<bool> addAlias(String index, String alias) async {
-    final action = _AliasAction(actionType: 'add', index: index, alias: alias);
-    final requestBody = _AliasAction.createAliasRequestBody([action]);
+    final requestBody = {
+      'actions': [
+        {
+          'add': {'index': index, 'alias': alias}
+        }
+      ]
+    };
     final rs = await _transport.send(
       Request('POST', ['_aliases'], bodyMap: requestBody),
     );
@@ -61,9 +66,13 @@ class Client {
   }
 
   Future<bool> removeAlias(String index, String alias) async {
-    final action =
-        _AliasAction(actionType: 'remove', index: index, alias: alias);
-    final requestBody = _AliasAction.createAliasRequestBody([action]);
+    final requestBody = {
+      'actions': [
+        {
+          'remove': {'index': index, 'alias': alias}
+        }
+      ]
+    };
     final rs = await _transport.send(
       Request('POST', ['_aliases'], bodyMap: requestBody),
     );
@@ -71,11 +80,16 @@ class Client {
   }
 
   Future<bool> swapAlias({String alias, String from, String to}) async {
-    final actions = [
-      _AliasAction(actionType: 'remove', index: from, alias: alias),
-      _AliasAction(actionType: 'add', index: to, alias: alias),
-    ];
-    final requestBody = _AliasAction.createAliasRequestBody(actions);
+    final requestBody = {
+      'actions': [
+        {
+          'remove': {'index': from, 'alias': alias}
+        },
+        {
+          'add': {'index': to, 'alias': alias}
+        }
+      ]
+    };
     final rs = await _transport.send(
       Request('POST', ['_aliases'], bodyMap: requestBody),
     );
@@ -383,28 +397,6 @@ abstract class Query {
     }
     return {
       'match': {field: map}
-    };
-  }
-}
-
-class _AliasAction {
-  final String actionType;
-  final String index;
-  final String alias;
-
-  _AliasAction({this.actionType, this.index, this.alias});
-
-  static Map<String, Object> createAliasRequestBody(
-      List<_AliasAction> actions) {
-    return {
-      'actions': actions
-          .map((action) => {
-                action.actionType: {
-                  'index': action.index,
-                  'alias': action.alias,
-                }
-              })
-          .toList()
     };
   }
 }
