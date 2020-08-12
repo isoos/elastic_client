@@ -1,3 +1,7 @@
+## 0.1.12
+
+- Support aliases operation ([#21](https://github.com/isoos/elastic_client/pull/21) by [asayamakk](https://github.com/asayamakk)).
+
 ## 0.1.11
 
 - Enabled merging documents with `updateDoc` ([#19](https://github.com/isoos/elastic_client/pull/19) by [jodinathan](https://github.com/jodinathan)).
