@@ -37,6 +37,8 @@ Future<void> main() async {
       {'some': 'data', 'name': 'Alice', 'distance': 10});
   await client.swapAlias(
       alias: 'my_index_alias', from: 'my_index', to: 'my_second_index');
+  final aliases = await client.getAliases(aliases: ['my_index_*']);
+  print(aliases.map((e) => {'alias': e.alias, 'index': e.index}));
   await client.removeAlias('my_second_index', 'my_index_alias');
 
   await transport.close();
