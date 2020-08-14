@@ -51,6 +51,32 @@ class Client {
     return rs.statusCode == 200;
   }
 
+  Future<List<Alias>> getAliases({List<String> aliases = const []}) async {
+    final rs = await _transport.send(
+      Request(
+        'GET',
+        ['_cat', 'aliases', aliases.join(',')],
+        params: {'format': 'json'},
+      ),
+    );
+    if (rs.statusCode != 200) {
+      throw Exception(
+          'Unable to get aliases information with ${aliases}. ${rs.statusCode} ${rs.body}');
+    }
+    final body = convert.json.decode(rs.body) as List;
+    return body
+        .map(
+          (alias) => Alias(
+            alias: alias['alias'] as String,
+            index: alias['index'] as String,
+            indexRouting: alias['routing.index'] as String,
+            searchRouting: alias['routing.search'] as String,
+            isWriteIndex: alias['is_write_index'] as String,
+          ),
+        )
+        .toList();
+  }
+
   Future<bool> addAlias(String index, String alias) async {
     final requestBody = {
       'actions': [
@@ -361,6 +387,26 @@ class Bucket {
     };
     map.removeWhere((k, v) => v == null);
     return map;
+  }
+}
+
+class Alias {
+  String alias;
+  String index;
+  String indexRouting;
+  String searchRouting;
+  bool isWriteIndex;
+
+  Alias({
+    this.alias,
+    this.index,
+    String indexRouting,
+    String searchRouting,
+    String isWriteIndex,
+  }) {
+    this.indexRouting = indexRouting == '-' ? '' : indexRouting;
+    this.searchRouting = searchRouting == '-' ? '' : searchRouting;
+    this.isWriteIndex = isWriteIndex == 'true';
   }
 }
 
