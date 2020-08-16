@@ -69,9 +69,13 @@ class Client {
           (alias) => Alias(
             alias: alias['alias'] as String,
             index: alias['index'] as String,
-            indexRouting: alias['routing.index'] as String,
-            searchRouting: alias['routing.search'] as String,
-            isWriteIndex: alias['is_write_index'] as String,
+            indexRouting: alias['routing.index'] == '-'
+                ? ''
+                : alias['routing.index'] as String,
+            searchRouting: alias['routing.search'] == '-'
+                ? ''
+                : alias['routing.search'] as String,
+            isWriteIndex: alias['is_write_index'] == 'true',
           ),
         )
         .toList();
@@ -391,23 +395,19 @@ class Bucket {
 }
 
 class Alias {
-  String alias;
-  String index;
-  String indexRouting;
-  String searchRouting;
-  bool isWriteIndex;
+  final String alias;
+  final String index;
+  final String indexRouting;
+  final String searchRouting;
+  final bool isWriteIndex;
 
   Alias({
     this.alias,
     this.index,
-    String indexRouting,
-    String searchRouting,
-    String isWriteIndex,
-  }) {
-    this.indexRouting = indexRouting == '-' ? '' : indexRouting;
-    this.searchRouting = searchRouting == '-' ? '' : searchRouting;
-    this.isWriteIndex = isWriteIndex == 'true';
-  }
+    this.indexRouting,
+    this.searchRouting,
+    this.isWriteIndex,
+  });
 }
 
 abstract class Query {
