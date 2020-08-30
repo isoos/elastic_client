@@ -51,6 +51,32 @@ class Client {
     return rs.statusCode == 200;
   }
 
+  Future<List<Alias>> getAliases({List<String> aliases = const []}) async {
+    final rs = await _transport.send(
+      Request(
+        'GET',
+        ['_cat', 'aliases', aliases.join(',')],
+        params: {'format': 'json'},
+      ),
+    );
+    if (rs.statusCode != 200) {
+      throw Exception(
+          'Unable to get aliases information with ${aliases}. ${rs.statusCode} ${rs.body}');
+    }
+    final body = convert.json.decode(rs.body) as List;
+    return body
+        .map(
+          (alias) => Alias(
+            alias: alias['alias'] as String,
+            index: alias['index'] as String,
+            indexRouting: alias['routing.index'] as String,
+            searchRouting: alias['routing.search'] as String,
+            isWriteIndex: alias['is_write_index'] == 'true',
+          ),
+        )
+        .toList();
+  }
+
   Future<bool> addAlias(String index, String alias) async {
     final requestBody = {
       'actions': [
@@ -362,6 +388,22 @@ class Bucket {
     map.removeWhere((k, v) => v == null);
     return map;
   }
+}
+
+class Alias {
+  final String alias;
+  final String index;
+  final String indexRouting;
+  final String searchRouting;
+  final bool isWriteIndex;
+
+  Alias({
+    this.alias,
+    this.index,
+    this.indexRouting,
+    this.searchRouting,
+    this.isWriteIndex,
+  });
 }
 
 abstract class Query {
