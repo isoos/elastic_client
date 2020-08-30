@@ -69,12 +69,8 @@ class Client {
           (alias) => Alias(
             alias: alias['alias'] as String,
             index: alias['index'] as String,
-            indexRouting: alias['routing.index'] == '-'
-                ? ''
-                : alias['routing.index'] as String,
-            searchRouting: alias['routing.search'] == '-'
-                ? ''
-                : alias['routing.search'] as String,
+            indexRouting: alias['routing.index'] as String,
+            searchRouting: alias['routing.search'] as String,
             isWriteIndex: alias['is_write_index'] == 'true',
           ),
         )
