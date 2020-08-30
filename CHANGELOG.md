@@ -1,3 +1,7 @@
+## 0.1.13
+
+- Support getAliases operation ([#22](https://github.com/isoos/elastic_client/pull/22) by [asayamakk](https://github.com/asayamakk)).
+
 ## 0.1.12
 
 - Support aliases operation ([#21](https://github.com/isoos/elastic_client/pull/21) by [asayamakk](https://github.com/asayamakk)).
