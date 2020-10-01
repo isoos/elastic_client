@@ -1,3 +1,7 @@
+## 0.1.14
+
+- Support scroll API. ([#24](https://github.com/isoos/elastic_client/pull/24) by [swdyh](https://github.com/swdyh))
+
 ## 0.1.13
 
 - Support getAliases operation ([#22](https://github.com/isoos/elastic_client/pull/22) by [asayamakk](https://github.com/asayamakk)).
