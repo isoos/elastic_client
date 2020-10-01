@@ -188,6 +188,7 @@ class Client {
     Map suggest,
     List<Map> sort,
     Map aggregations,
+    Duration scroll,
   }) async {
     final path = [index, type, '_search'];
     final map = {
@@ -200,31 +201,19 @@ class Client {
       'aggregations': aggregations,
     };
     map.removeWhere((k, v) => v == null);
-    final rs = await _transport.send(Request('POST', path,
-        params: {'search_type': 'dfs_query_then_fetch'}, bodyMap: map));
+    final params = {
+      'search_type': 'dfs_query_then_fetch',
+      if (scroll != null) 'scroll': scroll.inSeconds.toString() + 's',
+    };
+    final rs = await _transport
+        .send(Request('POST', path, params: params, bodyMap: map));
     if (rs.statusCode != 200) {
       throw Exception('Failed to search $query');
     }
-    final body = convert.json.decode(rs.body);
-    final hitsMap = body['hits'] ?? const {};
-    final hitsTotal = hitsMap['total'];
-    var totalCount = 0;
-    if (hitsTotal is int) {
-      totalCount = hitsTotal;
-    } else if (hitsTotal is Map) {
-      totalCount = (hitsTotal['value'] as int) ?? 0;
-    }
-    final hitsList = (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
-    final results = hitsList
-        .map((Map map) => Doc(
-              map['_id'] as String,
-              map['_source'] as Map,
-              index: map['_index'] as String,
-              type: map['_type'] as String,
-              score: map['_score'] as double,
-              sort: map['sort'] as List<dynamic>,
-            ))
-        .toList();
+    final body = convert.json.decode(rs.body) as Map<String, dynamic>;
+    final hitsMap = body['hits'] as Map<String, dynamic> ?? const {};
+    final totalCount = _extractTotalCount(hitsMap);
+    final results = _extractDocList(hitsMap);
     final suggestMap = body['suggest'] as Map ?? const {};
     final suggestHits = suggestMap.map<String, List<SuggestHit>>((k, v) {
       if (v == null) return null;
@@ -265,7 +254,68 @@ class Client {
       results,
       suggestHits: suggestHits.isEmpty ? null : suggestHits,
       aggregations: aggResult.isEmpty ? null : aggResult,
+      scrollId: body['_scroll_id'] as String,
     );
+  }
+
+  Future<SearchResult> scroll(String scrollId, Duration scroll) async {
+    final path = ['_search', 'scroll'];
+    final bodyMap = {
+      'scroll_id': scrollId,
+      'scroll': scroll.inSeconds.toString() + 's',
+    };
+    final rs = await _transport.send(Request('GET', path, bodyMap: bodyMap));
+    if (rs.statusCode != 200) {
+      throw Exception('Failed to search scroll');
+    }
+    final body = convert.json.decode(rs.body) as Map<String, dynamic>;
+    final hitsMap = body['hits'] as Map<String, dynamic> ?? const {};
+    final totalCount = _extractTotalCount(hitsMap);
+    final results = _extractDocList(hitsMap);
+
+    return SearchResult(
+      totalCount,
+      results,
+      scrollId: body['_scroll_id'] as String,
+    );
+  }
+
+  Future<ClearScrollResult> clearScroll(List<String> scrollIdList) async {
+    final path = ['_search', 'scroll'];
+    final bodyMap = {'scroll_id': scrollIdList};
+    final rs = await _transport.send(Request('DELETE', path, bodyMap: bodyMap));
+    if (rs.statusCode != 200 && rs.statusCode != 404) {
+      throw Exception('Failed to search scroll');
+    }
+    final body = convert.json.decode(rs.body);
+    return ClearScrollResult(
+        body['succeeded'] as bool ?? false, body['num_freed'] as int ?? 0);
+  }
+
+  int _extractTotalCount(Map<String, dynamic> hitsMap) {
+    final hitsTotal = hitsMap['total'];
+    var totalCount = 0;
+    if (hitsTotal is int) {
+      totalCount = hitsTotal;
+    } else if (hitsTotal is Map) {
+      totalCount = (hitsTotal['value'] as int) ?? 0;
+    }
+    return totalCount;
+  }
+
+  List<Doc> _extractDocList(Map<String, dynamic> hitsMap) {
+    final hitsList = (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
+    final results = hitsList
+        .map((Map map) => Doc(
+              map['_id'] as String,
+              map['_source'] as Map,
+              index: map['_index'] as String,
+              type: map['_type'] as String,
+              score: map['_score'] as double,
+              sort: map['sort'] as List<dynamic>,
+            ))
+        .toList();
+    return results;
   }
 }
 
@@ -274,9 +324,10 @@ class SearchResult {
   final List<Doc> hits;
   final Map<String, List<SuggestHit>> suggestHits;
   final Map<String, Aggregation> aggregations;
+  final String scrollId;
 
   SearchResult(this.totalCount, this.hits,
-      {this.suggestHits, this.aggregations});
+      {this.suggestHits, this.aggregations, this.scrollId});
 
   Map toMap() => {
         'totalCount': totalCount,
@@ -404,6 +455,14 @@ class Alias {
     this.searchRouting,
     this.isWriteIndex,
   });
+}
+
+class ClearScrollResult {
+  final bool succeeded;
+  final int numFreed;
+  ClearScrollResult(this.succeeded, this.numFreed);
+
+  Map toMap() => {'succeeded': succeeded, 'numFreed': numFreed};
 }
 
 abstract class Query {
