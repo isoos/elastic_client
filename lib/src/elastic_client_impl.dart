@@ -179,7 +179,7 @@ class Client {
 
   Future<SearchResult> search(
     String index,
-    String? type,
+    String type,
     Map query, {
     int offset,
     int limit,
