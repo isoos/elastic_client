@@ -190,7 +190,7 @@ class Client {
     Map aggregations,
     Duration scroll,
   }) async {
-    path = [index, '_search'];
+    var path = [index, '_search'];
 
     if (type != null) {
       path = [index, type, '_search'];
