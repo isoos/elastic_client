@@ -179,7 +179,7 @@ class Client {
 
   Future<SearchResult> search(
     String index,
-    String type,
+    String? type,
     Map query, {
     int offset,
     int limit,
@@ -190,7 +190,12 @@ class Client {
     Map aggregations,
     Duration scroll,
   }) async {
-    final path = [index, type, '_search'];
+    path = [index, '_search'];
+
+    if (type != null) {
+      path = [index, type, '_search'];
+    }
+    
     final map = {
       '_source': source ?? fetchSource,
       'query': query,
