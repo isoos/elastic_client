@@ -190,7 +190,12 @@ class Client {
     Map aggregations,
     Duration scroll,
   }) async {
-    final path = [index, type, '_search'];
+    final path = [
+      index,
+      if (type != null) type,
+      '_search',
+    ];
+    
     final map = {
       '_source': source ?? fetchSource,
       'query': query,
