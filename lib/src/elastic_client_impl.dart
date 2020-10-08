@@ -190,11 +190,11 @@ class Client {
     Map aggregations,
     Duration scroll,
   }) async {
-    var path = [index, '_search'];
-
-    if (type != null) {
-      path = [index, type, '_search'];
-    }
+    final path = [
+      index,
+      if (type != null) type,
+      '_search',
+    ];
     
     final map = {
       '_source': source ?? fetchSource,
