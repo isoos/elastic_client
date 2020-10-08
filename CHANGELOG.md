@@ -1,3 +1,7 @@
+## 0.1.15
+
+- The `type` parameter in the index may be null. ([#25](https://github.com/isoos/elastic_client/pull/25) by [fabiocarneiro](https://github.com/fabiocarneiro))
+
 ## 0.1.14
 
 - Support scroll API. ([#24](https://github.com/isoos/elastic_client/pull/24) by [swdyh](https://github.com/swdyh))
