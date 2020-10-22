@@ -198,7 +198,7 @@ class Client {
     
     final map = {
       '_source': source ?? fetchSource,
-      'query': query ? query : new Map(),
+      'query': query ?? {},
       'from': offset,
       'size': limit,
       'suggest': suggest,
