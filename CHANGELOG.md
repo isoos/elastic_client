@@ -2,8 +2,18 @@
 
 **Breaking changes:**
 - `Client.search`:
-  - `index`, `type` and `query` got optional.
+  - `index`, `type` and `query` got named and optional.
   - Removed `fetchSource` parameter, use `source instead.
+- `Client.updateDoc`:
+  - `index`, `type`, `id` and `doc` got named.
+  - `id` and `type` got optional.
+- `Client.updateDocs`:
+  - `index`, `type` and `docs` got named.
+  - `index` and `type` got optional.
+- `Client.deleteDoc`:
+  - `index`, `id` and `type` got named.
+  - `type` got optional.
+- `Client.clearScroll` was renamed to `clearScrollIds`.
 - Removed `ConsoleHttpTransport`, use `HttpTransport` instead.
 - Removed `BasicAuth`, use `basicAuthorization` instead.
 - `HttpTransport` changed:
@@ -13,6 +23,7 @@
   - Closes HTTP client if and only if there was none provided.
 
 Updates:
+- `Client.clearScrollId` for deleting a single scroll id.
 - `TransportException` when we've got unexpected status code from ElasticSearch.
 
 ## 0.1.15

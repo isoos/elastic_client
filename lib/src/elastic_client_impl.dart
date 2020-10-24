@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert' as convert;
 
+import 'package:meta/meta.dart';
+
 import 'transport.dart';
 
 class Doc {
@@ -25,35 +27,52 @@ class Doc {
   }
 }
 
+/// Client to connect to ElasticSearch.
 class Client {
   final Transport _transport;
 
+  /// Client to connect to ElasticSearch using a [Transport].
   Client(this._transport);
 
+  /// Returns weather and [index] exists.
   Future<bool> indexExists(String index) async {
     final rs = await _transport.send(Request('HEAD', [index]));
     return rs.statusCode == 200;
   }
 
+  /// Updates and [index] definition with [content].
   Future updateIndex(String index, Map<String, dynamic> content) async {
     await _transport.send(Request('PUT', [index], bodyMap: content));
   }
 
+  /// Flush [index].
   Future flushIndex(String index) async {
     await _transport.send(Request('POST', [index, '_flush'],
         params: {'wait_if_ongoing': 'true'}));
   }
 
+  /// Delete [index].
+  ///
+  /// Returns the success status of the delete operation.
   Future<bool> deleteIndex(String index) async {
     final rs = await _transport.send(Request('DELETE', [index]));
     return rs.statusCode == 200;
   }
 
-  Future<List<Alias>> getAliases({List<String> aliases = const []}) async {
+  /// List [aliases].
+  ///
+  /// When [aliases] is not specified, all items will be returned.
+  Future<List<Alias>> getAliases({
+    List<String> aliases = const <String>[],
+  }) async {
     final rs = await _transport.send(
       Request(
         'GET',
-        ['_cat', 'aliases', aliases.join(',')],
+        [
+          '_cat',
+          'aliases',
+          if (aliases.isNotEmpty) aliases.join(','),
+        ],
         params: {'format': 'json'},
       ),
     );
@@ -73,6 +92,7 @@ class Client {
         .toList();
   }
 
+  /// Add [alias] to [index].
   Future<bool> addAlias(String index, String alias) async {
     final requestBody = {
       'actions': [
@@ -87,6 +107,7 @@ class Client {
     return rs.statusCode == 200;
   }
 
+  /// Remove [alias] from [index].
   Future<bool> removeAlias(String index, String alias) async {
     final requestBody = {
       'actions': [
@@ -101,7 +122,12 @@ class Client {
     return rs.statusCode == 200;
   }
 
-  Future<bool> swapAlias({String alias, String from, String to}) async {
+  /// Changes [alias] instead of pointing to [from], it will point to [to].
+  Future<bool> swapAlias({
+    @required String alias,
+    @required String from,
+    @required String to,
+  }) async {
     final requestBody = {
       'actions': [
         {
@@ -118,19 +144,33 @@ class Client {
     return rs.statusCode == 200;
   }
 
-  Future<bool> updateDoc(
-      String index, String type, String id, Map<String, dynamic> doc,
-      {bool merge = false}) async {
-    final pathSegments = [index, type];
-    if (id != null) pathSegments.add(id);
-    if (merge) pathSegments.add('_update');
+  /// Update [doc] in [index].
+  Future<bool> updateDoc({
+    @required String index,
+    @required Map<String, dynamic> doc,
+    String type,
+    String id,
+    bool merge = false,
+  }) async {
+    final pathSegments = <String>[
+      index,
+      if (type != null) type,
+      if (id != null) id,
+      if (merge) '_update',
+    ];
     final rs =
         await _transport.send(Request('POST', pathSegments, bodyMap: doc));
     return rs.statusCode == 200 || rs.statusCode == 201;
   }
 
-  Future<bool> updateDocs(String index, String type, List<Doc> docs,
-      {int batchSize = 100}) async {
+  /// Bulk update [docs] in [index].
+  Future<bool> updateDocs({
+    @required List<Doc> docs,
+    String index,
+    String type,
+    int batchSize = 100,
+  }) async {
+    // TODO: verify if docs.index is consistent with index.
     final pathSegments = [
       if (index != null) index,
       if (type != null) type,
@@ -162,11 +202,20 @@ class Client {
     return true;
   }
 
-  Future<int> deleteDoc(String index, String type, String id) async {
-    final rs = await _transport.send(Request('DELETE', [index, type, id]));
+  /// Deletes [id] from [index].
+  Future<int> deleteDoc({
+    @required String index,
+    @required String id,
+    String type,
+  }) async {
+    final rs =
+        await _transport.send(Request('DELETE', [index, type ?? '_doc', id]));
     return rs.statusCode == 200 ? 1 : 0;
   }
 
+  /// Deletes documents from [index] using [query].
+  ///
+  /// Returns the number of deleted documents.
   Future<int> deleteDocs(String index, Map query) async {
     final rs = await _transport.send(Request(
         'POST', [index, '_delete_by_query'],
@@ -175,6 +224,7 @@ class Client {
     return rs.bodyAsMap['deleted'] as int ?? 0;
   }
 
+  /// Search :-)
   Future<SearchResult> search({
     String index,
     String type,
@@ -257,6 +307,7 @@ class Client {
     );
   }
 
+  /// Continue search using the scroll API.
   Future<SearchResult> scroll(String scrollId, Duration scroll) async {
     final path = ['_search', 'scroll'];
     final bodyMap = {
@@ -277,9 +328,14 @@ class Client {
     );
   }
 
-  Future<ClearScrollResult> clearScroll(List<String> scrollIdList) async {
+  /// Clear scroll ids.
+  Future<ClearScrollResult> clearScrollId(String scrollId) =>
+      clearScrollIds([scrollId]);
+
+  /// Clear scroll ids.
+  Future<ClearScrollResult> clearScrollIds(List<String> scrollIds) async {
     final path = ['_search', 'scroll'];
-    final bodyMap = {'scroll_id': scrollIdList};
+    final bodyMap = {'scroll_id': scrollIds};
     final rs = await _transport.send(Request('DELETE', path, bodyMap: bodyMap));
     if (rs.statusCode != 200 && rs.statusCode != 404) {
       throw Exception('Failed to search scroll');
