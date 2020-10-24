@@ -61,7 +61,7 @@ class Client {
     );
     if (rs.statusCode != 200) {
       throw Exception(
-          'Unable to get aliases information with ${aliases}. ${rs.statusCode} ${rs.body}');
+          'Unable to get aliases information with $aliases. ${rs.statusCode} ${rs.body}');
     }
     final body = convert.json.decode(rs.body) as List;
     return body
@@ -473,7 +473,12 @@ abstract class Query {
 
   static Map matchNone() => {'match_none': {}};
 
-  static Map bool({must, filter, should, mustNot}) {
+  static Map bool({
+    dynamic must,
+    dynamic filter,
+    dynamic should,
+    dynamic mustNot,
+  }) {
     final map = {};
     if (must != null) map['must'] = must;
     if (filter != null) map['filter'] = filter;
