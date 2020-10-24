@@ -177,10 +177,10 @@ class Client {
     return rs.bodyAsMap['deleted'] as int ?? 0;
   }
 
-  Future<SearchResult> search(
+  Future<SearchResult> search({
     String index,
     String type,
-    Map query, {
+    Map query, 
     int offset,
     int limit,
     @Deprecated("Use 'source' instead") bool fetchSource = false,
@@ -191,14 +191,14 @@ class Client {
     Duration scroll,
   }) async {
     final path = [
-      index,
+      if (index != null) index,
       if (type != null) type,
       '_search',
     ];
     
     final map = {
       '_source': source ?? fetchSource,
-      'query': query,
+      'query': query ?? {},
       'from': offset,
       'size': limit,
       'suggest': suggest,
