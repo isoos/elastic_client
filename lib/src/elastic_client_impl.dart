@@ -14,16 +14,14 @@ class Doc {
   Doc(this.id, this.doc, {this.index, this.type, this.score, this.sort});
 
   Map toMap() {
-    final map = {
-      '_index': index,
-      '_type': type,
-      '_id': id,
-      '_score': score,
-      'doc': doc,
-      'sort': sort,
+    return {
+      if (index != null) '_index': index,
+      if (type != null) '_type': type,
+      if (id != null) '_id': id,
+      if (score != null) '_score': score,
+      if (doc != null) 'doc': doc,
+      if (sort != null) 'sort': sort,
     };
-    map.removeWhere((k, v) => v == null);
-    return map;
   }
 }
 
@@ -135,17 +133,21 @@ class Client {
 
   Future<bool> updateDocs(String index, String type, List<Doc> docs,
       {int batchSize = 100}) async {
-    final pathSegments = [index, type, '_bulk']..removeWhere((v) => v == null);
+    final pathSegments = [
+      if (index != null) index,
+      if (type != null) type,
+      '_bulk',
+    ];
     for (var start = 0; start < docs.length;) {
       final sub = docs.skip(start).take(batchSize).toList();
       final lines = sub
           .map((doc) => [
                 {
                   'index': {
-                    '_index': doc.index,
-                    '_type': doc.type,
-                    '_id': doc.id
-                  }..removeWhere((k, v) => v == null)
+                    if (doc.index != null) '_index': doc.index,
+                    if (doc.type != null) '_type': doc.type,
+                    if (doc.id != null) '_id': doc.id,
+                  }
                 },
                 doc.doc,
               ])
@@ -375,17 +377,16 @@ class Aggregation {
   List<Bucket> buckets;
 
   Map toMap() {
-    final map = {
-      'name': name,
-      'value': value,
-      'values': values,
-      'docCountErrorUpperBound': docCountErrorUpperBound,
-      'sumOtherDocCount': sumOtherDocCount,
-      'hits': hits?.map((i) => i.toMap()),
-      'buckets': buckets?.map((i) => i.toMap()),
+    return {
+      if (name != null) 'name': name,
+      if (value != null) 'value': value,
+      if (values != null) 'values': values,
+      if (docCountErrorUpperBound != null)
+        'docCountErrorUpperBound': docCountErrorUpperBound,
+      if (sumOtherDocCount != null) 'sumOtherDocCount': sumOtherDocCount,
+      if (hits != null) 'hits': hits.map((i) => i.toMap()).toList(),
+      if (buckets != null) 'buckets': buckets.map((i) => i.toMap()).toList(),
     };
-    map.removeWhere((k, v) => v == null);
-    return map;
   }
 
   Aggregation(String name, Map<String, dynamic> param, Map<String, dynamic> m) {
@@ -434,13 +435,12 @@ class Bucket {
   Map<String, Aggregation> aggregations;
 
   Map toMap() {
-    final map = {
-      'key': key,
-      'docCount': docCount,
-      'aggregations': aggregations?.map((k, v) => MapEntry(k, v.toMap())),
+    return {
+      if (key != null) 'key': key,
+      if (docCount != null) 'docCount': docCount,
+      if (aggregations != null)
+        'aggregations': aggregations.map((k, v) => MapEntry(k, v.toMap())),
     };
-    map.removeWhere((k, v) => v == null);
-    return map;
   }
 }
 
@@ -468,44 +468,3 @@ class ClearScrollResult {
   Map toMap() => {'succeeded': succeeded, 'numFreed': numFreed};
 }
 
-abstract class Query {
-  static Map matchAll() => {'match_all': {}};
-
-  static Map matchNone() => {'match_none': {}};
-
-  static Map bool({
-    dynamic must,
-    dynamic filter,
-    dynamic should,
-    dynamic mustNot,
-  }) {
-    final map = {};
-    if (must != null) map['must'] = must;
-    if (filter != null) map['filter'] = filter;
-    if (should != null) map['should'] = should;
-    if (mustNot != null) map['mustNot'] = mustNot;
-    return {'bool': map};
-  }
-
-  static Map exists(String field) => {
-        'exists': {'field': field}
-      };
-
-  static Map term(String field, List<String> terms) => {
-        'terms': {field: terms}
-      };
-
-  static Map prefix(String field, String value) => {
-        'prefix': {field: value},
-      };
-
-  static Map match(String field, String text, {String minimum}) {
-    final map = {'query': text};
-    if (minimum != null) {
-      map['minimum_should_match'] = minimum;
-    }
-    return {
-      'match': {field: map}
-    };
-  }
-}
