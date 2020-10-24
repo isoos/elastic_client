@@ -12,7 +12,7 @@ class HttpTransport implements Transport {
   final Uri _uri;
   final http.Client _httpClient;
   final Duration _timeout;
-  final BasicAuth _basicAuth;
+  final String _authorization;
   final bool _shouldCloseClient;
 
   /// Creates a new HttpTransport instance.
@@ -20,12 +20,12 @@ class HttpTransport implements Transport {
     @required /* String | Uri */ dynamic url,
     dynamic client,
     Duration timeout = const Duration(minutes: 1),
-    BasicAuth basicAuth,
+    String authorization,
   })  : _httpClient = _castClient(client),
         _shouldCloseClient = client != null,
         _uri = _castUri(url),
         _timeout = timeout,
-        _basicAuth = basicAuth;
+        _authorization = authorization;
 
   @override
   Future<Response> send(Request request) async {
@@ -36,8 +36,8 @@ class HttpTransport implements Transport {
     final newUri = _uri.replace(
         pathSegments: pathSegments, queryParameters: request.params);
     final rq = http.Request(request.method, newUri);
-    if (_basicAuth != null) {
-      rq.headers.addAll(_basicAuth.toMap());
+    if (_authorization != null) {
+      rq.headers['Authorization'] = _authorization;
     }
     if (request.headers != null) {
       rq.headers.addAll(request.headers);
@@ -57,16 +57,10 @@ class HttpTransport implements Transport {
   }
 }
 
-class BasicAuth {
-  final String username;
-  final String password;
-
-  BasicAuth(this.username, this.password);
-
-  Map<String, String> toMap() {
-    final up = convert.utf8.encode('$username:$password');
-    return {'Authorization': 'Basic ${convert.base64Encode(up)}'};
-  }
+/// Creates the `Basic` authorization header with [username] and [password].
+String basicAuthorization(String username, String password) {
+  final up = convert.utf8.encode('$username:$password');
+  return 'Basic ${convert.base64Encode(up)}';
 }
 
 Uri _castUri(dynamic url) {

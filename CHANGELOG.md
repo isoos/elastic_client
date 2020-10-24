@@ -5,9 +5,11 @@
   - `index`, `type` and `query` got optional.
   - Removed `fetchSource` parameter, use `source instead.
 - Removed `ConsoleHttpTransport`, use `HttpTransport` instead.
+- Removed `BasicAuth`, use `basicAuthorization` instead.
 - `HttpTransport` changed:
   - Constructor accepts `client` from both `package:http` or `package:http_client`.
   - Constructor accepts `url` as `String` or `Uri`.
+  - Constructor accepts `authorization` header as a pass-through value.
   - Closes HTTP client if and only if there was none provided.
 
 Updates:
