@@ -57,11 +57,9 @@ class Client {
         params: {'format': 'json'},
       ),
     );
-    if (rs.statusCode != 200) {
-      throw Exception(
-          'Unable to get aliases information with $aliases. ${rs.statusCode} ${rs.body}');
-    }
-    final body = convert.json.decode(rs.body) as List;
+    rs.throwIfStatusNotOK(
+        message: 'Unable to get aliases information with $aliases.');
+    final body = rs.bodyAsList;
     return body
         .map(
           (alias) => Alias(
@@ -157,10 +155,8 @@ class Client {
           .join();
       final rs =
           await _transport.send(Request('POST', pathSegments, bodyText: lines));
-      if (rs.statusCode != 200) {
-        throw Exception(
-            'Unable to update batch starting with $start. ${rs.statusCode} ${rs.body}');
-      }
+      rs.throwIfStatusNotOK(
+          message: 'Unable to update batch starting with $start.');
       start += sub.length;
     }
     return true;
@@ -212,10 +208,8 @@ class Client {
     };
     final rs = await _transport
         .send(Request('POST', path, params: params, bodyMap: map));
-    if (rs.statusCode != 200) {
-      throw Exception('Failed to search $query');
-    }
-    final body = convert.json.decode(rs.body) as Map<String, dynamic>;
+    rs.throwIfStatusNotOK(message: 'Failed to search $query.');
+    final body = rs.bodyAsMap;
     final hitsMap = body['hits'] as Map<String, dynamic> ?? const {};
     final totalCount = _extractTotalCount(hitsMap);
     final results = _extractDocList(hitsMap);
@@ -270,10 +264,8 @@ class Client {
       'scroll': scroll.inSeconds.toString() + 's',
     };
     final rs = await _transport.send(Request('GET', path, bodyMap: bodyMap));
-    if (rs.statusCode != 200) {
-      throw Exception('Failed to search scroll');
-    }
-    final body = convert.json.decode(rs.body) as Map<String, dynamic>;
+    rs.throwIfStatusNotOK(message: 'Failed to search scroll.');
+    final body = rs.bodyAsMap;
     final hitsMap = body['hits'] as Map<String, dynamic> ?? const {};
     final totalCount = _extractTotalCount(hitsMap);
     final results = _extractDocList(hitsMap);
@@ -292,7 +284,7 @@ class Client {
     if (rs.statusCode != 200 && rs.statusCode != 404) {
       throw Exception('Failed to search scroll');
     }
-    final body = convert.json.decode(rs.body);
+    final body = rs.bodyAsMap;
     return ClearScrollResult(
         body['succeeded'] as bool ?? false, body['num_freed'] as int ?? 0);
   }
@@ -467,4 +459,3 @@ class ClearScrollResult {
 
   Map toMap() => {'succeeded': succeeded, 'numFreed': numFreed};
 }
-

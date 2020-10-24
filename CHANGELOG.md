@@ -5,6 +5,9 @@
   - `index`, `type` and `query` got optional.
   - removed `fetchSource` parameter, use `source instead.
 
+Updates:
+- `TransportException` when we've got unexpected status code from ElasticSearch.
+
 ## 0.1.15
 
 - The `type` parameter in the index may be null. ([#25](https://github.com/isoos/elastic_client/pull/25) by [fabiocarneiro](https://github.com/fabiocarneiro))
