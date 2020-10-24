@@ -6,9 +6,10 @@ version: 0.2.0-dev
 homepage: https://github.com/isoos/elastic_client
 
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.9.0 <3.0.0'
 
 dependencies:
+  http: ^0.12.2
   http_client: ^1.0.0
   meta: ^1.0.0
 

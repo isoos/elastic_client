@@ -1,9 +1,8 @@
-import 'package:elastic_client/console_http_transport.dart';
-import 'package:elastic_client/elastic_client.dart' as elastic;
+import 'package:elastic_client/elastic_client.dart';
 
 Future<void> main() async {
-  final transport = ConsoleHttpTransport(Uri.parse('http://localhost:9200/'));
-  final client = elastic.Client(transport);
+  final transport = HttpTransport(url: 'http://localhost:9200/');
+  final client = Client(transport);
 
   await client.updateDoc('my_index', 'my_type', 'my_id_1',
       {'some': 'data', 'name': 'Sue', 'distance': 10});
@@ -16,7 +15,7 @@ Future<void> main() async {
   final rs1 = await client.search(
       index: 'my_index',
       type: 'my_type',
-      query: elastic.Query.term('some', ['data']),
+      query: Query.term('some', ['data']),
       source: true);
   print(rs1.toMap());
 
@@ -25,7 +24,7 @@ Future<void> main() async {
   final rs2 = await client.search(
       index: 'my_index',
       type: 'my_type',
-      query: elastic.Query.term('some', ['data']),
+      query: Query.term('some', ['data']),
       source: [
         'some',
         'name'

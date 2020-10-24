@@ -1,17 +1,16 @@
 import 'dart:async';
 
-import 'package:elastic_client/elastic_client.dart' as elastic;
-import 'package:elastic_client/console_http_transport.dart';
+import 'package:elastic_client/elastic_client.dart';
 
 Future<void> main() async {
-  final client =
-      Client(ConsoleHttpTransport(Uri.parse('http://localhost:9042/')));
+  final transport = HttpTransport(url: 'http://localhost:9042/');
+  final client = Client(transport);
 
   // bucket aggregation
   final rs3 = await client.search(
       index: 'my_index',
       type: 'my_type',
-      query: elastic.Query.matchAll(),
+      query: Query.matchAll(),
       aggregations: {
         'agg1': {
           'terms': {'field': 'name.keyword'}
@@ -26,7 +25,7 @@ Future<void> main() async {
   final rs4 = await client.search(
       index: 'my_index',
       type: 'my_type',
-      query: elastic.Query.matchAll(),
+      query: Query.matchAll(),
       aggregations: {
         'agg1': {
           'avg': {'field': 'distance'}
@@ -39,7 +38,7 @@ Future<void> main() async {
   final rs5 = await client.search(
       index: 'my_index',
       type: 'my_type',
-      query: elastic.Query.matchAll(),
+      query: Query.matchAll(),
       aggregations: {
         'agg1': {
           'percentiles': {'field': 'distance'}
@@ -52,7 +51,7 @@ Future<void> main() async {
   final rs6 = await client.search(
     index: 'my_index',
     type: 'my_type',
-    query: elastic.Query.matchAll(),
+    query: Query.matchAll(),
     aggregations: {
       'agg1': {
         'terms': {'field': 'distance'},
@@ -77,7 +76,7 @@ Future<void> main() async {
   final rs7 = await client.search(
     index: 'my_index',
     type: 'my_type',
-    query: elastic.Query.matchAll(),
+    query: Query.matchAll(),
     aggregations: {
       'agg1': {
         'terms': {'field': 'distance'},
@@ -94,4 +93,5 @@ Future<void> main() async {
   });
   // ({_index: my_index, _type: my_type, _id: my_id_1, _score: 1.0, doc: {some: data, name: Sue, distance: 10}})
   // ({_index: my_index, _type: my_type, _id: my_id_2, _score: 1.0, doc: {some: data, name: Bob, distance: 20}})
+  await transport.close();
 }

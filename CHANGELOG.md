@@ -3,7 +3,12 @@
 **Breaking changes:**
 - `Client.search`:
   - `index`, `type` and `query` got optional.
-  - removed `fetchSource` parameter, use `source instead.
+  - Removed `fetchSource` parameter, use `source instead.
+- Removed `ConsoleHttpTransport`, use `HttpTransport` instead.
+- `HttpTransport` changed:
+  - Constructor accepts `client` from both `package:http` or `package:http_client`.
+  - Constructor accepts `url` as `String` or `Uri`.
+  - Closes HTTP client if and only if there was none provided.
 
 Updates:
 - `TransportException` when we've got unexpected status code from ElasticSearch.
