@@ -8,42 +8,51 @@ Future<void> main() async {
       Client(ConsoleHttpTransport(Uri.parse('http://localhost:9042/')));
 
   // bucket aggregation
-  final rs3 = await client
-      .search('my_index', 'my_type', elastic.Query.matchAll(), aggregations: {
-    'agg1': {
-      'terms': {'field': 'name.keyword'}
-    }
-  });
+  final rs3 = await client.search(
+      index: 'my_index',
+      type: 'my_type',
+      query: elastic.Query.matchAll(),
+      aggregations: {
+        'agg1': {
+          'terms': {'field': 'name.keyword'}
+        }
+      });
   rs3.aggregations['agg1'].buckets.forEach((i) => print(i.toMap()));
   // {key: Bob, docCount: 1}
   // {key: Joe, docCount: 1}
   // {key: Sue, docCount: 1}
 
   // metric aggregation (value)
-  final rs4 = await client
-      .search('my_index', 'my_type', elastic.Query.matchAll(), aggregations: {
-    'agg1': {
-      'avg': {'field': 'distance'}
-    }
-  });
+  final rs4 = await client.search(
+      index: 'my_index',
+      type: 'my_type',
+      query: elastic.Query.matchAll(),
+      aggregations: {
+        'agg1': {
+          'avg': {'field': 'distance'}
+        }
+      });
   print(rs4.aggregations['agg1'].value);
   // 13.333333333333334
 
   // metric aggregation (values)
-  final rs5 = await client
-      .search('my_index', 'my_type', elastic.Query.matchAll(), aggregations: {
-    'agg1': {
-      'percentiles': {'field': 'distance'}
-    }
-  });
+  final rs5 = await client.search(
+      index: 'my_index',
+      type: 'my_type',
+      query: elastic.Query.matchAll(),
+      aggregations: {
+        'agg1': {
+          'percentiles': {'field': 'distance'}
+        }
+      });
   print(rs5.aggregations['agg1'].values);
   // {1.0: 9.999999999999998, 5.0: 10.0, 25.0: 10.0, 50.0: 10.0, 75.0: 17.5, 95.0: 20.0, 99.0: 20.0}
 
   // bucket aggregation (nested)
   final rs6 = await client.search(
-    'my_index',
-    'my_type',
-    elastic.Query.matchAll(),
+    index: 'my_index',
+    type: 'my_type',
+    query: elastic.Query.matchAll(),
     aggregations: {
       'agg1': {
         'terms': {'field': 'distance'},
@@ -66,9 +75,9 @@ Future<void> main() async {
 
   // bucket aggregation (top_hits)
   final rs7 = await client.search(
-    'my_index',
-    'my_type',
-    elastic.Query.matchAll(),
+    index: 'my_index',
+    type: 'my_type',
+    query: elastic.Query.matchAll(),
     aggregations: {
       'agg1': {
         'terms': {'field': 'distance'},

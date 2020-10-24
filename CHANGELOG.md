@@ -1,3 +1,10 @@
+## 0.2.0
+
+**Breaking changes:**
+- `Client.search`:
+  - `index`, `type` and `query` got optional.
+  - removed `fetchSource` parameter, use `source instead.
+
 ## 0.1.15
 
 - The `type` parameter in the index may be null. ([#25](https://github.com/isoos/elastic_client/pull/25) by [fabiocarneiro](https://github.com/fabiocarneiro))

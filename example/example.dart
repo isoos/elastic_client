@@ -14,14 +14,18 @@ Future<void> main() async {
   await client.flushIndex('my_index');
 
   final rs1 = await client.search(
-      'my_index', 'my_type', elastic.Query.term('some', ['data']),
+      index: 'my_index',
+      type: 'my_type',
+      query: elastic.Query.term('some', ['data']),
       source: true);
   print(rs1.toMap());
 
   print('---');
 
   final rs2 = await client.search(
-      'my_index', 'my_type', elastic.Query.term('some', ['data']),
+      index: 'my_index',
+      type: 'my_type',
+      query: elastic.Query.term('some', ['data']),
       source: [
         'some',
         'name'

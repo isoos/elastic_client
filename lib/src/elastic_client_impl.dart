@@ -180,10 +180,9 @@ class Client {
   Future<SearchResult> search({
     String index,
     String type,
-    Map query, 
+    Map query,
     int offset,
     int limit,
-    @Deprecated("Use 'source' instead") bool fetchSource = false,
     dynamic source,
     Map suggest,
     List<Map> sort,
@@ -195,17 +194,16 @@ class Client {
       if (type != null) type,
       '_search',
     ];
-    
+
     final map = {
-      '_source': source ?? fetchSource,
+      if (source != null) '_source': source,
       'query': query ?? {},
-      'from': offset,
-      'size': limit,
-      'suggest': suggest,
-      'sort': sort,
-      'aggregations': aggregations,
+      if (offset != null) 'from': offset,
+      if (limit != null) 'size': limit,
+      if (suggest != null) 'suggest': suggest,
+      if (sort != null) 'sort': sort,
+      if (aggregations != null) 'aggregations': aggregations,
     };
-    map.removeWhere((k, v) => v == null);
     final params = {
       'search_type': 'dfs_query_then_fetch',
       if (scroll != null) 'scroll': scroll.inSeconds.toString() + 's',
