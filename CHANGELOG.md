@@ -25,6 +25,7 @@
 Updates:
 - `Client.clearScrollId` for deleting a single scroll id.
 - `TransportException` when we've got unexpected status code from ElasticSearch.
+- Minimal test! yay!
 
 ## 0.1.15
 

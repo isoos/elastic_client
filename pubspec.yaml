@@ -14,5 +14,6 @@ dependencies:
   meta: ^1.0.0
 
 dev_dependencies:
+  docker_process: ^1.2.0
   pedantic: ^1.0.0
   test: ^1.0.0

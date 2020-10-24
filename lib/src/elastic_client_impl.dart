@@ -3,6 +3,7 @@ import 'dart:convert' as convert;
 
 import 'package:meta/meta.dart';
 
+import 'query.dart';
 import 'transport.dart';
 
 class Doc {
@@ -41,14 +42,16 @@ class Client {
   }
 
   /// Updates and [index] definition with [content].
-  Future updateIndex(String index, Map<String, dynamic> content) async {
-    await _transport.send(Request('PUT', [index], bodyMap: content));
+  Future<void> updateIndex(String index, Map<String, dynamic> content) async {
+    final rs = await _transport.send(Request('PUT', [index], bodyMap: content));
+    rs.throwIfStatusNotOK(message: 'Index update failed.');
   }
 
   /// Flush [index].
-  Future flushIndex(String index) async {
-    await _transport.send(Request('POST', [index, '_flush'],
+  Future<void> flushIndex(String index) async {
+    final rs = await _transport.send(Request('POST', [index, '_flush'],
         params: {'wait_if_ongoing': 'true'}));
+    rs.throwIfStatusNotOK(message: 'Index flust failed.');
   }
 
   /// Delete [index].
@@ -155,8 +158,8 @@ class Client {
     final pathSegments = <String>[
       index,
       if (type != null) type,
-      if (id != null) id,
       if (merge) '_update',
+      if (id != null) id,
     ];
     final rs =
         await _transport.send(Request('POST', pathSegments, bodyMap: doc));
@@ -245,7 +248,7 @@ class Client {
 
     final map = {
       if (source != null) '_source': source,
-      'query': query ?? {},
+      'query': query ?? Query.matchAll(),
       if (offset != null) 'from': offset,
       if (limit != null) 'size': limit,
       if (suggest != null) 'suggest': suggest,
