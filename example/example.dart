@@ -22,7 +22,7 @@ Future<void> main() async {
     id: 'my_id_3',
     doc: {'some': 'data', 'name': 'Joe', 'distance': 10},
   );
-  await client.flushIndex('my_index');
+  await client.flushIndex(index: 'my_index');
 
   final rs1 = await client.search(
       index: 'my_index',
@@ -47,7 +47,7 @@ Future<void> main() async {
       ]);
   print(rs2.toMap());
 
-  await client.addAlias('my_index', 'my_index_alias');
+  await client.addAlias(index: 'my_index', alias: 'my_index_alias');
   await client.updateDoc(
     index: 'my_second_index',
     type: 'my_type',
@@ -58,7 +58,7 @@ Future<void> main() async {
       alias: 'my_index_alias', from: 'my_index', to: 'my_second_index');
   final aliases = await client.getAliases(aliases: ['my_index_*']);
   print(aliases.map((e) => {'alias': e.alias, 'index': e.index}));
-  await client.removeAlias('my_second_index', 'my_index_alias');
+  await client.removeAlias(index: 'my_second_index', alias: 'my_index_alias');
 
   await transport.close();
 }

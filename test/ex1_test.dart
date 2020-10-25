@@ -31,24 +31,27 @@ void main() {
     }, timeout: Timeout(Duration(minutes: 2)));
 
     test('index does not exists', () async {
-      expect(await client.indexExists('test-ex1'), isFalse);
+      expect(await client.indexExists(index: 'test-ex1'), isFalse);
     });
 
     test('create index and add document', () async {
-      await client.updateIndex('test-ex1', {
-        'settings': {
-          'index': {
-            'number_of_shards': 1,
-            'number_of_replicas': 0,
+      await client.updateIndex(
+        index: 'test-ex1',
+        content: {
+          'settings': {
+            'index': {
+              'number_of_shards': 1,
+              'number_of_replicas': 0,
+            },
+          },
+          'mappings': {
+            'properties': {
+              'field1': {'type': 'text'},
+            },
           },
         },
-        'mappings': {
-          'properties': {
-            'field1': {'type': 'text'},
-          },
-        },
-      });
-      expect(await client.indexExists('test-ex1'), isTrue);
+      );
+      expect(await client.indexExists(index: 'test-ex1'), isTrue);
 
       expect(
           await client.updateDoc(
@@ -61,7 +64,7 @@ void main() {
             },
           ),
           isTrue);
-      await client.flushIndex('test-ex1');
+      await client.flushIndex(index: 'test-ex1');
 
       final rs = await client.search(
         index: 'test-ex1',

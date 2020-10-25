@@ -1,19 +1,12 @@
 ## 0.2.0
 
 **Breaking changes:**
-- `Client.search`:
-  - `index`, `type` and `query` got named and optional.
-  - Removed `fetchSource` parameter, use `source instead.
-- `Client.updateDoc`:
-  - `index`, `type`, `id` and `doc` got named.
-  - `id` and `type` got optional.
-- `Client.updateDocs`:
-  - `index`, `type` and `docs` got named.
-  - `index` and `type` got optional.
-- `Client.deleteDoc`:
-  - `index`, `id` and `type` got named.
-  - `type` got optional.
-- `Client.clearScroll` was renamed to `clearScrollIds`.
+- `Client` methods updated:
+  - every parameter is a named parameter,
+  - required parameters are marked as such,
+  - `search`: removed `fetchSource` parameter, use `source instead,
+  - `clearScroll` was renamed to `clearScrollIds`,
+  - `scroll`'s `scroll` parameter renamed to `duration`.
 - Removed `ConsoleHttpTransport`, use `HttpTransport` instead.
 - Removed `BasicAuth`, use `basicAuthorization` instead.
 - `HttpTransport` changed:
