@@ -5,7 +5,7 @@ import 'package:http_client/http_client.dart' as http_client;
 import 'package:http_client/pkg_http_adapter.dart' as pkg_http_adapter;
 import 'package:meta/meta.dart';
 
-import 'transport.dart';
+import 'elastic_client_impl.dart';
 
 /// The default transport implementation over HTTP.
 class HttpTransport implements Transport {

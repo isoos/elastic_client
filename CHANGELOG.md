@@ -18,6 +18,7 @@
 Updates:
 - `Client.clearScrollId` for deleting a single scroll id.
 - `TransportException` when we've got unexpected status code from ElasticSearch.
+- `Client.index(name: 'index-name')` creates a shortcut to access index-based operations.
 - Minimal test! yay!
 
 ## 0.1.15

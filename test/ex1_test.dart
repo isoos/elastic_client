@@ -35,8 +35,8 @@ void main() {
     });
 
     test('create index and add document', () async {
-      await client.updateIndex(
-        index: 'test-ex1',
+      final index = client.index(name: 'test-ex1');
+      await index.update(
         content: {
           'settings': {
             'index': {
@@ -51,12 +51,10 @@ void main() {
           },
         },
       );
-      expect(await client.indexExists(index: 'test-ex1'), isTrue);
+      expect(await index.exists(), isTrue);
 
       expect(
-          await client.updateDoc(
-            index: 'test-ex1',
-            type: '_doc',
+          await index.updateDoc(
             id: 'id-1',
             doc: {
               'field1': 'abcd12',
@@ -64,11 +62,9 @@ void main() {
             },
           ),
           isTrue);
-      await client.flushIndex(index: 'test-ex1');
+      await index.flush();
 
-      final rs = await client.search(
-        index: 'test-ex1',
-        type: '_doc',
+      final rs = await index.search(
         query: Query.prefix('field1', 'abc'),
       );
       expect(rs.totalCount, 1);

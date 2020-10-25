@@ -1,3 +1,5 @@
+part of 'elastic_client_impl.dart';
+
 abstract class Query {
   static Map matchAll() => {'match_all': {}};
 

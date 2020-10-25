@@ -1,6 +1,4 @@
-import 'dart:convert' as convert;
-
-import 'package:meta/meta.dart';
+part of 'elastic_client_impl.dart';
 
 /// Communication abstraction for adding multiple layers on top of the basic
 /// HTTP client.
