@@ -43,4 +43,13 @@ abstract class Query {
       },
     };
   }
+
+  static Map queryString(String query, {String defaultField}) {
+    return {
+      'query_string': {
+        'query': query,
+        if (defaultField != null) 'default_field': defaultField,
+      },
+    };
+  }
 }

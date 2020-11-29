@@ -47,6 +47,24 @@ class IndexRef {
         merge: merge,
       );
 
+  /// Bulk update of the current index.
+  ///
+  /// In the following order:
+  /// - [updateDocs] will be updated
+  /// - [deleteDocs] will be deleted
+  Future<bool> bulk({
+    List<Doc> updateDocs,
+    List<Doc> deleteDocs,
+    int batchSize = 100,
+  }) =>
+      _client.bulk(
+        updateDocs: updateDocs,
+        deleteDocs: deleteDocs,
+        batchSize: batchSize,
+        index: name,
+        type: type,
+      );
+
   /// Bulk update [docs] in index.
   Future<bool> updateDocs({
     @required List<Doc> docs,

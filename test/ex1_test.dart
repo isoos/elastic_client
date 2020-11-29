@@ -58,14 +58,14 @@ void main() {
             id: 'id-1',
             doc: {
               'field1': 'abcd12',
-              'field2': ['ab', 'cd'],
+              'field2': ['abab', 'cd'],
             },
           ),
           isTrue);
       await index.flush();
 
       final rs = await index.search(
-        query: Query.prefix('field1', 'abc'),
+        query: Query.prefix('field2.keyword', 'aba'),
       );
       expect(rs.totalCount, 1);
       expect(rs.hits, hasLength(1));

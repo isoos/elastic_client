@@ -1,3 +1,8 @@
+## 0.2.1
+
+- `Query.queryString`.
+- `Client.bulk` and `Index.bulk` support delete and batch size.
+
 ## 0.2.0
 
 **Breaking changes:**
