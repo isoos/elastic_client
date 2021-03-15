@@ -52,4 +52,23 @@ abstract class Query {
       },
     };
   }
+
+  static Map range(
+    String field, {
+    dynamic gt,
+    dynamic gte,
+    dynamic lt,
+    dynamic lte,
+  }) {
+    return {
+      'range': {
+        field: {
+          if (gt != null) 'gt': gt,
+          if (gte != null) 'gte': gte,
+          if (lt != null) 'lt': lt,
+          if (lte != null) 'lte': lte,
+        },
+      },
+    };
+  }
 }

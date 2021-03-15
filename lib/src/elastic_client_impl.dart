@@ -6,6 +6,7 @@ import 'package:meta/meta.dart';
 part '_client.dart';
 part '_index.dart';
 part '_query.dart';
+part '_search.dart';
 part '_transport.dart';
 
 class Doc {
@@ -16,7 +17,14 @@ class Doc {
   final double score;
   final List<dynamic> sort;
 
-  Doc(this.id, this.doc, {this.index, this.type, this.score, this.sort});
+  Doc(
+    this.id,
+    this.doc, {
+    this.index,
+    this.type,
+    this.score,
+    this.sort,
+  });
 
   Map toMap() {
     return {
@@ -30,9 +38,34 @@ class Doc {
   }
 }
 
+class Hit extends Doc {
+  final Map<String, List<dynamic>> fields;
+  final Map<String, List<String>> highlight;
+
+  Hit(
+    String id,
+    Map doc, {
+    String index,
+    String type,
+    double score,
+    List<dynamic> sort,
+        this.fields,
+    this.highlight,
+  }) : super(id, doc, index: index, type: type, score: score, sort: sort);
+
+  @override
+  Map toMap() {
+    return {
+      ...super.toMap(),
+      if (fields != null) 'fields': fields,
+      if (highlight != null) 'highlight': highlight,
+    };
+  }
+}
+
 class SearchResult {
   final int totalCount;
-  final List<Doc> hits;
+  final List<Hit> hits;
   final Map<String, List<SuggestHit>> suggestHits;
   final Map<String, Aggregation> aggregations;
   final String scrollId;

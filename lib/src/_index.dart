@@ -92,11 +92,14 @@ class IndexRef {
     Map query,
     int offset,
     int limit,
+    List<Object> fields,
     dynamic source,
     Map suggest,
     List<Map> sort,
     Map aggregations,
     Duration scroll,
+    HighlightOptions highlight,
+    bool trackTotalHits,
   }) async {
     return await _client.search(
       index: name,
@@ -104,11 +107,24 @@ class IndexRef {
       query: query,
       offset: offset,
       limit: limit,
+      fields: fields,
       source: source,
       suggest: suggest,
       sort: sort,
       aggregations: aggregations,
       scroll: scroll,
+      highlight: highlight,
+      trackTotalHits: trackTotalHits,
     );
+  }
+
+  /// Get the index mapping.
+  ///
+  /// WARNING: this is not a finalized API, may change in the future.
+  Future<Map<String, dynamic>> getMapping() async {
+    final rs =
+        await _client._transport.send(Request('GET', [name, '_mapping']));
+    rs.throwIfStatusNotOK(message: 'Failed to get mapping for $name.');
+    return rs.bodyAsMap;
   }
 }

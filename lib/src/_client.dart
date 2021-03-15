@@ -274,11 +274,14 @@ class Client {
     Map query,
     int offset,
     int limit,
+    List<Object> fields,
     dynamic source,
     Map suggest,
     List<Map> sort,
     Map aggregations,
     Duration scroll,
+    HighlightOptions highlight,
+    bool trackTotalHits,
   }) async {
     final path = [
       if (index != null) index,
@@ -288,12 +291,15 @@ class Client {
 
     final map = {
       if (source != null) '_source': source,
+      if (fields != null) 'fields': fields,
       'query': query ?? Query.matchAll(),
       if (offset != null) 'from': offset,
       if (limit != null) 'size': limit,
       if (suggest != null) 'suggest': suggest,
       if (sort != null) 'sort': sort,
       if (aggregations != null) 'aggregations': aggregations,
+      if (highlight != null) 'highlight': highlight.toMap(),
+      if (trackTotalHits != null) 'track_total_hits': trackTotalHits,
     };
     final params = {
       'search_type': 'dfs_query_then_fetch',
@@ -403,18 +409,64 @@ class Client {
     return totalCount;
   }
 
-  List<Doc> _extractDocList(Map<String, dynamic> hitsMap) {
+  List<Hit> _extractDocList(Map<String, dynamic> hitsMap) {
     final hitsList = (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
     final results = hitsList
-        .map((Map map) => Doc(
+        .map((Map map) => Hit(
               map['_id'] as String,
               map['_source'] as Map,
               index: map['_index'] as String,
               type: map['_type'] as String,
               score: map['_score'] as double,
               sort: map['sort'] as List<dynamic>,
+              fields: _extractFields(map['fields']),
+              highlight: _extractHighlight(map['highlight']),
             ))
         .toList();
     return results;
+  }
+
+  Map<String, List<dynamic>> _extractFields(value) {
+    if (value == null) return null;
+
+    if (value is Map<String, dynamic>) {
+      final fields = <String, List<dynamic>>{};
+      value.forEach((k, v) {
+        if (v == null) return;
+
+        final list = [];
+        if (v is String) {
+          list.add(v);
+        } else if (v is List) {
+          list.addAll(v);
+        } else {
+          throw FormatException('Unknown format for fields value: $v');
+        }
+        fields[k] = list;
+      });
+      return fields;
+    }
+    throw FormatException('Unknown format for fields value: $value');  }
+
+  Map<String, List<String>> _extractHighlight(value) {
+    if (value == null) return null;
+    if (value is Map<String, dynamic>) {
+      final highlights = <String, List<String>>{};
+      value.forEach((k, v) {
+        if (v == null) return;
+
+        final list = <String>[];
+        if (v is String) {
+          list.add(v);
+        } else if (v is List) {
+          list.addAll(v.map((x) => x.toString()));
+        } else {
+          throw FormatException('Unknown format for highlight field: $v');
+        }
+        highlights[k] = list;
+      });
+      return highlights;
+    }
+    throw FormatException('Unknown format for highlight value: $value');
   }
 }
