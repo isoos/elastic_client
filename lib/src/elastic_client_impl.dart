@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert' as convert;
 
-import 'package:meta/meta.dart';
-
 part '_client.dart';
 part '_index.dart';
 part '_query.dart';
@@ -10,12 +8,12 @@ part '_search.dart';
 part '_transport.dart';
 
 class Doc {
-  final String index;
-  final String type;
+  final String? index;
+  final String? type;
   final String id;
   final Map doc;
-  final double score;
-  final List<dynamic> sort;
+  final double? score;
+  final List<dynamic>? sort;
 
   Doc(
     this.id,
@@ -30,26 +28,26 @@ class Doc {
     return {
       if (index != null) '_index': index,
       if (type != null) '_type': type,
-      if (id != null) '_id': id,
+      '_id': id,
       if (score != null) '_score': score,
-      if (doc != null) 'doc': doc,
+      'doc': doc,
       if (sort != null) 'sort': sort,
     };
   }
 }
 
 class Hit extends Doc {
-  final Map<String, List<dynamic>> fields;
-  final Map<String, List<String>> highlight;
+  final Map<String, List<dynamic>>? fields;
+  final Map<String, List<String>>? highlight;
 
   Hit(
     String id,
     Map doc, {
-    String index,
-    String type,
-    double score,
-    List<dynamic> sort,
-        this.fields,
+    String? index,
+    String? type,
+    double? score,
+    List<dynamic>? sort,
+    this.fields,
     this.highlight,
   }) : super(id, doc, index: index, type: type, score: score, sort: sort);
 
@@ -66,9 +64,9 @@ class Hit extends Doc {
 class SearchResult {
   final int totalCount;
   final List<Hit> hits;
-  final Map<String, List<SuggestHit>> suggestHits;
-  final Map<String, Aggregation> aggregations;
-  final String scrollId;
+  final Map<String, List<SuggestHit>>? suggestHits;
+  final Map<String, Aggregation>? aggregations;
+  final String? scrollId;
 
   SearchResult(this.totalCount, this.hits,
       {this.suggestHits, this.aggregations, this.scrollId});
@@ -91,8 +89,8 @@ class SuggestHit {
 class SuggestHitOption {
   final String text;
   final double score;
-  final int freq;
-  final String highlighted;
+  final int? freq;
+  final String? highlighted;
 
   SuggestHitOption(this.text, this.score, {this.freq, this.highlighted});
 }
@@ -107,13 +105,13 @@ class ElasticDocHit {
 }
 
 class Aggregation {
-  String name;
+  String? name;
   dynamic value;
-  Map values;
-  int docCountErrorUpperBound;
-  int sumOtherDocCount;
-  List<Doc> hits;
-  List<Bucket> buckets;
+  Map? values;
+  int? docCountErrorUpperBound;
+  int? sumOtherDocCount;
+  List<Doc>? hits;
+  List<Bucket>? buckets;
 
   Map toMap() {
     return {
@@ -123,8 +121,8 @@ class Aggregation {
       if (docCountErrorUpperBound != null)
         'docCountErrorUpperBound': docCountErrorUpperBound,
       if (sumOtherDocCount != null) 'sumOtherDocCount': sumOtherDocCount,
-      if (hits != null) 'hits': hits.map((i) => i.toMap()).toList(),
-      if (buckets != null) 'buckets': buckets.map((i) => i.toMap()).toList(),
+      if (hits != null) 'hits': hits!.map((i) => i.toMap()).toList(),
+      if (buckets != null) 'buckets': buckets!.map((i) => i.toMap()).toList(),
     };
   }
 
@@ -136,8 +134,7 @@ class Aggregation {
     sumOtherDocCount = m['sum_other_doc_count'] as int;
 
     final hitsMap = m['hits'] ?? const {};
-    final hitsList =
-        ((hitsMap['hits'] ?? []) as List).cast<Map>() ?? const <Map>[];
+    final hitsList = (hitsMap['hits'] as List?)?.cast<Map>() ?? const <Map>[];
     final hits = hitsList
         .map((map) => Doc(
               map['_id'] as String,
@@ -150,12 +147,12 @@ class Aggregation {
         .toList();
     this.hits = hits.isEmpty ? null : hits;
 
-    final bucketMapList = ((m['buckets'] ?? []) as List).cast<Map>() ?? <Map>[];
+    final bucketMapList = (m['buckets'] as List?)?.cast<Map>() ?? <Map>[];
     final buckets = bucketMapList.map<Bucket>((bucketMap) {
       final bucket = Bucket()
         ..key = bucketMap['key']
         ..docCount = bucketMap['doc_count'] as int;
-      final aggMap = param['aggs'] as Map<String, dynamic> ?? const {};
+      final aggMap = param['aggs'] as Map<String, dynamic>? ?? const {};
       final aggs = aggMap.map<String, Aggregation>((subName, subParam) {
         final subMap = bucketMap[subName] as Map<String, dynamic>;
         return MapEntry(subName,
@@ -170,25 +167,25 @@ class Aggregation {
 
 class Bucket {
   dynamic key;
-  int docCount;
-  Map<String, Aggregation> aggregations;
+  int? docCount;
+  Map<String, Aggregation>? aggregations;
 
   Map toMap() {
     return {
       if (key != null) 'key': key,
       if (docCount != null) 'docCount': docCount,
       if (aggregations != null)
-        'aggregations': aggregations.map((k, v) => MapEntry(k, v.toMap())),
+        'aggregations': aggregations!.map((k, v) => MapEntry(k, v.toMap())),
     };
   }
 }
 
 class Alias {
-  final String alias;
-  final String index;
-  final String indexRouting;
-  final String searchRouting;
-  final bool isWriteIndex;
+  final String? alias;
+  final String? index;
+  final String? indexRouting;
+  final String? searchRouting;
+  final bool? isWriteIndex;
 
   Alias({
     this.alias,

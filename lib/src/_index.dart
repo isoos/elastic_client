@@ -4,7 +4,7 @@ part of 'elastic_client_impl.dart';
 class IndexRef {
   final Client _client;
   final String name;
-  final String type;
+  final String? type;
 
   IndexRef._(this._client, this.name, this.type);
 
@@ -13,7 +13,7 @@ class IndexRef {
 
   /// Updates index definition with [content].
   Future<void> update({
-    Map<String, dynamic> content,
+    Map<String, dynamic>? content,
   }) =>
       _client.updateIndex(index: name, content: content);
 
@@ -26,17 +26,17 @@ class IndexRef {
   Future<bool> delete() => _client.deleteIndex(index: name);
 
   /// Add index to [alias].
-  Future<bool> addToAlias({@required String alias}) =>
+  Future<bool> addToAlias({required String alias}) =>
       _client.addAlias(alias: alias, index: name);
 
   /// Remove index from [alias].
-  Future<bool> removeFromAlias({@required String alias}) =>
+  Future<bool> removeFromAlias({required String alias}) =>
       _client.removeAlias(alias: alias, index: name);
 
   /// Update [doc] in index.
   Future<bool> updateDoc({
-    @required Map<String, dynamic> doc,
-    String id,
+    required Map<String, dynamic> doc,
+    String? id,
     bool merge = false,
   }) =>
       _client.updateDoc(
@@ -53,8 +53,8 @@ class IndexRef {
   /// - [updateDocs] will be updated
   /// - [deleteDocs] will be deleted
   Future<bool> bulk({
-    List<Doc> updateDocs,
-    List<Doc> deleteDocs,
+    List<Doc>? updateDocs,
+    List<Doc>? deleteDocs,
     int batchSize = 100,
   }) =>
       _client.bulk(
@@ -67,7 +67,7 @@ class IndexRef {
 
   /// Bulk update [docs] in index.
   Future<bool> updateDocs({
-    @required List<Doc> docs,
+    required List<Doc> docs,
     int batchSize = 100,
   }) =>
       _client.updateDocs(
@@ -78,28 +78,28 @@ class IndexRef {
       );
 
   /// Deletes [id] from index.
-  Future<int> deleteDoc({@required String id}) =>
+  Future<int> deleteDoc({required String id}) =>
       _client.deleteDoc(index: name, id: id, type: type);
 
   /// Deletes documents from index using [query].
   ///
   /// Returns the number of deleted documents.
-  Future<int> deleteDocs({@required Map query}) =>
+  Future<int> deleteDocs({required Map query}) =>
       _client.deleteDocs(index: name, query: query);
 
   /// Search :-)
   Future<SearchResult> search({
-    Map query,
-    int offset,
-    int limit,
-    List<Object> fields,
+    Map? query,
+    int? offset,
+    int? limit,
+    List<Object>? fields,
     dynamic source,
-    Map suggest,
-    List<Map> sort,
-    Map aggregations,
-    Duration scroll,
-    HighlightOptions highlight,
-    bool trackTotalHits,
+    Map? suggest,
+    List<Map>? sort,
+    Map? aggregations,
+    Duration? scroll,
+    HighlightOptions? highlight,
+    bool? trackTotalHits,
   }) async {
     return await _client.search(
       index: name,

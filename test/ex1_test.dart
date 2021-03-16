@@ -5,9 +5,9 @@ import 'package:elastic_client/elastic_client.dart';
 
 void main() {
   group('ex1', () {
-    DockerProcess dp;
-    HttpTransport httpTransport;
-    Client client;
+    DockerProcess? dp;
+    HttpTransport? httpTransport;
+    late Client client;
 
     test('setup', () async {
       final port = 13131;
@@ -27,7 +27,7 @@ void main() {
         timeout: Duration(seconds: 110),
       );
       httpTransport = HttpTransport(url: 'http://127.0.0.1:$port/');
-      client = Client(httpTransport);
+      client = Client(httpTransport!);
     }, timeout: Timeout(Duration(minutes: 2)));
 
     test('index does not exists', () async {
@@ -63,6 +63,7 @@ void main() {
           ),
           isTrue);
       await index.flush();
+      await Future.delayed(Duration(seconds: 2));
 
       final rs = await index.search(
         query: Query.prefix('field2.keyword', 'aba'),

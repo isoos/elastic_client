@@ -19,13 +19,13 @@ class Request {
   final List<String> pathSegments;
 
   /// The body as text.
-  final String bodyText;
+  final String? bodyText;
 
   /// The HTTP headers being sent alongside the request.
-  final Map<String, String> headers;
+  final Map<String, String>? headers;
 
   /// The query parameters of the request.
-  final Map<String, String> params;
+  final Map<String, String>? params;
 
   Request._(
       this.method, this.pathSegments, this.bodyText, this.headers, this.params);
@@ -37,9 +37,9 @@ class Request {
   factory Request(
     String method,
     List<String> pathSegments, {
-    Map<String, dynamic> bodyMap,
-    String bodyText,
-    Map<String, String> params,
+    Map<String, dynamic>? bodyMap,
+    String? bodyText,
+    Map<String, String>? params,
   }) {
     if (bodyMap != null && bodyText != null) {
       throw ArgumentError(
@@ -60,8 +60,8 @@ class Response {
   /// The body of the response.
   final String body;
 
-  Map<String, dynamic> _bodyAsMap;
-  List _bodyAsList;
+  Map<String, dynamic>? _bodyAsMap;
+  List? _bodyAsList;
 
   /// Creates a new [Response] object.
   Response(this.statusCode, this.body);
@@ -72,7 +72,7 @@ class Response {
 
   List get bodyAsList => _bodyAsList ??= convert.json.decode(body) as List;
 
-  void throwIfStatusNotOK({@required String message}) {
+  void throwIfStatusNotOK({required String message}) {
     if (statusCode == 200) return;
     throw TransportException(message, statusCode: statusCode, body: body);
   }
@@ -84,10 +84,10 @@ class TransportException implements Exception {
   final String message;
 
   /// The status code of the response.
-  final int statusCode;
+  final int? statusCode;
 
   /// The body text of the response.
-  final String body;
+  final String? body;
 
   ///
   TransportException(this.message, {this.statusCode, this.body});

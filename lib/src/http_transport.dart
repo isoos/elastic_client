@@ -12,7 +12,7 @@ class HttpTransport implements Transport {
   final Uri _uri;
   final http.Client _httpClient;
   final Duration _timeout;
-  final String _authorization;
+  final String? _authorization;
   final bool _shouldCloseClient;
 
   /// Creates a new HttpTransport instance.
@@ -20,7 +20,7 @@ class HttpTransport implements Transport {
     @required /* String | Uri */ dynamic url,
     dynamic client,
     Duration timeout = const Duration(minutes: 1),
-    String authorization,
+    String? authorization,
   })  : _httpClient = _castClient(client),
         _shouldCloseClient = client != null,
         _uri = _castUri(url),
@@ -30,20 +30,20 @@ class HttpTransport implements Transport {
   @override
   Future<Response> send(Request request) async {
     final pathSegments = <String>[
-      ...?_uri.pathSegments,
-      ...?request.pathSegments,
+      ..._uri.pathSegments,
+      ...request.pathSegments,
     ];
     final newUri = _uri.replace(
         pathSegments: pathSegments, queryParameters: request.params);
     final rq = http.Request(request.method, newUri);
     if (_authorization != null) {
-      rq.headers['Authorization'] = _authorization;
+      rq.headers['Authorization'] = _authorization!;
     }
     if (request.headers != null) {
-      rq.headers.addAll(request.headers);
+      rq.headers.addAll(request.headers!);
     }
     if (request.bodyText != null) {
-      rq.body = request.bodyText;
+      rq.body = request.bodyText!;
     }
     final rs = await _httpClient.send(rq).timeout(_timeout);
     return Response(rs.statusCode, await rs.stream.bytesToString());

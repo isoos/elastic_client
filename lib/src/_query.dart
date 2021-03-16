@@ -33,7 +33,7 @@ abstract class Query {
         'prefix': {field: value},
       };
 
-  static Map match(String field, String text, {String minimum}) {
+  static Map match(String field, String text, {String? minimum}) {
     return {
       'match': {
         field: {
@@ -44,7 +44,7 @@ abstract class Query {
     };
   }
 
-  static Map queryString(String query, {String defaultField}) {
+  static Map queryString(String query, {String? defaultField}) {
     return {
       'query_string': {
         'query': query,

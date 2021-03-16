@@ -1,3 +1,7 @@
+## 0.3.0-null-safety.1
+
+- Migrated to null safety.
+
 ## 0.2.2
 
 - `SearchResult.hits` has a separate `Hit` type, extending `Doc` for backwards compatibility.

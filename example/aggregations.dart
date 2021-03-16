@@ -16,7 +16,7 @@ Future<void> main() async {
           'terms': {'field': 'name.keyword'}
         }
       });
-  rs3.aggregations['agg1'].buckets.forEach((i) => print(i.toMap()));
+  rs3.aggregations!['agg1']!.buckets!.forEach((i) => print(i.toMap()));
   // {key: Bob, docCount: 1}
   // {key: Joe, docCount: 1}
   // {key: Sue, docCount: 1}
@@ -31,7 +31,7 @@ Future<void> main() async {
           'avg': {'field': 'distance'}
         }
       });
-  print(rs4.aggregations['agg1'].value);
+  print(rs4.aggregations!['agg1']!.value);
   // 13.333333333333334
 
   // metric aggregation (values)
@@ -44,7 +44,7 @@ Future<void> main() async {
           'percentiles': {'field': 'distance'}
         }
       });
-  print(rs5.aggregations['agg1'].values);
+  print(rs5.aggregations!['agg1']!.values);
   // {1.0: 9.999999999999998, 5.0: 10.0, 25.0: 10.0, 50.0: 10.0, 75.0: 17.5, 95.0: 20.0, 99.0: 20.0}
 
   // bucket aggregation (nested)
@@ -63,8 +63,8 @@ Future<void> main() async {
       }
     },
   );
-  rs6.aggregations['agg1'].buckets.forEach((b) {
-    b.aggregations['agg1_agg1'].buckets.forEach((b2) {
+  rs6.aggregations!['agg1']!.buckets!.forEach((b) {
+    b.aggregations!['agg1_agg1']!.buckets!.forEach((b2) {
       print('${b.key} ${b2.toMap()}');
     });
   });
@@ -88,8 +88,8 @@ Future<void> main() async {
       }
     },
   );
-  rs7.aggregations['agg1'].buckets.forEach((i) {
-    print(i.aggregations['agg1_agg1'].hits.map((doc) => doc.toMap()));
+  rs7.aggregations!['agg1']!.buckets!.forEach((i) {
+    print(i.aggregations!['agg1_agg1']!.hits!.map((doc) => doc.toMap()));
   });
   // ({_index: my_index, _type: my_type, _id: my_id_1, _score: 1.0, doc: {some: data, name: Sue, distance: 10}})
   // ({_index: my_index, _type: my_type, _id: my_id_2, _score: 1.0, doc: {some: data, name: Bob, distance: 20}})

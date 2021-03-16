@@ -9,28 +9,28 @@ class Client {
 
   /// Shorthand operations for index.
   IndexRef index({
-    @required String name,
-    String type,
+    required String name,
+    String? type,
   }) =>
       IndexRef._(this, name, type);
 
   /// Returns weather [index] exists.
-  Future<bool> indexExists({@required String index}) async {
+  Future<bool> indexExists({required String index}) async {
     final rs = await _transport.send(Request('HEAD', [index]));
     return rs.statusCode == 200;
   }
 
   /// Updates [index] definition with [content].
   Future<void> updateIndex({
-    @required String index,
-    Map<String, dynamic> content,
+    required String index,
+    Map<String, dynamic>? content,
   }) async {
     final rs = await _transport.send(Request('PUT', [index], bodyMap: content));
     rs.throwIfStatusNotOK(message: 'Index update failed.');
   }
 
   /// Flush [index].
-  Future<void> flushIndex({@required String index}) async {
+  Future<void> flushIndex({required String index}) async {
     final rs = await _transport.send(Request('POST', [index, '_flush'],
         params: {'wait_if_ongoing': 'true'}));
     rs.throwIfStatusNotOK(message: 'Index flust failed.');
@@ -39,7 +39,7 @@ class Client {
   /// Delete [index].
   ///
   /// Returns the success status of the delete operation.
-  Future<bool> deleteIndex({@required String index}) async {
+  Future<bool> deleteIndex({required String index}) async {
     final rs = await _transport.send(Request('DELETE', [index]));
     return rs.statusCode == 200;
   }
@@ -79,8 +79,8 @@ class Client {
 
   /// Add [index] to [alias].
   Future<bool> addAlias({
-    @required String alias,
-    @required String index,
+    required String alias,
+    required String index,
   }) async {
     final requestBody = {
       'actions': [
@@ -97,8 +97,8 @@ class Client {
 
   /// Remove [index] from [alias].
   Future<bool> removeAlias({
-    @required String alias,
-    @required String index,
+    required String alias,
+    required String index,
   }) async {
     final requestBody = {
       'actions': [
@@ -115,9 +115,9 @@ class Client {
 
   /// Changes [alias] instead of pointing to [from], it will point to [to].
   Future<bool> swapAlias({
-    @required String alias,
-    @required String from,
-    @required String to,
+    required String alias,
+    required String from,
+    required String to,
   }) async {
     final requestBody = {
       'actions': [
@@ -137,10 +137,10 @@ class Client {
 
   /// Update [doc] in [index].
   Future<bool> updateDoc({
-    @required String index,
-    @required Map<String, dynamic> doc,
-    String type,
-    String id,
+    required String index,
+    required Map<String, dynamic> doc,
+    String? type,
+    String? id,
     bool merge = false,
   }) async {
     final pathSegments = <String>[
@@ -160,10 +160,10 @@ class Client {
   /// - [updateDocs] will be updated
   /// - [deleteDocs] will be deleted
   Future<bool> bulk({
-    List<Doc> updateDocs,
-    List<Doc> deleteDocs,
-    String index,
-    String type,
+    List<Doc>? updateDocs,
+    List<Doc>? deleteDocs,
+    String? index,
+    String? type,
     int batchSize = 100,
   }) async {
     // TODO: verify if docs.index is consistent with index.
@@ -203,7 +203,7 @@ class Client {
         'index': {
           if (doc.index != null) '_index': doc.index,
           if (doc.type != null) '_type': doc.type,
-          if (doc.id != null) '_id': doc.id,
+          '_id': doc.id,
         }
       }));
       sb.writeln(convert.json.encode(doc.doc));
@@ -229,9 +229,9 @@ class Client {
 
   /// Bulk update [docs] in [index].
   Future<bool> updateDocs({
-    @required List<Doc> docs,
-    String index,
-    String type,
+    required List<Doc> docs,
+    String? index,
+    String? type,
     int batchSize = 100,
   }) async {
     return await bulk(
@@ -244,9 +244,9 @@ class Client {
 
   /// Deletes [id] from [index].
   Future<int> deleteDoc({
-    @required String index,
-    @required String id,
-    String type,
+    required String index,
+    required String id,
+    String? type,
   }) async {
     final rs =
         await _transport.send(Request('DELETE', [index, type ?? '_doc', id]));
@@ -257,31 +257,31 @@ class Client {
   ///
   /// Returns the number of deleted documents.
   Future<int> deleteDocs({
-    @required String index,
-    @required Map query,
+    required String index,
+    required Map query,
   }) async {
     final rs = await _transport.send(Request(
         'POST', [index, '_delete_by_query'],
         bodyMap: {'query': query}));
     if (rs.statusCode != 200) return 0;
-    return rs.bodyAsMap['deleted'] as int ?? 0;
+    return rs.bodyAsMap['deleted'] as int? ?? 0;
   }
 
   /// Search :-)
   Future<SearchResult> search({
-    String index,
-    String type,
-    Map query,
-    int offset,
-    int limit,
-    List<Object> fields,
+    String? index,
+    String? type,
+    Map? query,
+    int? offset,
+    int? limit,
+    List<Object>? fields,
     dynamic source,
-    Map suggest,
-    List<Map> sort,
-    Map aggregations,
-    Duration scroll,
-    HighlightOptions highlight,
-    bool trackTotalHits,
+    Map? suggest,
+    List<Map>? sort,
+    Map? aggregations,
+    Duration? scroll,
+    HighlightOptions? highlight,
+    bool? trackTotalHits,
   }) async {
     final path = [
       if (index != null) index,
@@ -309,40 +309,37 @@ class Client {
         .send(Request('POST', path, params: params, bodyMap: map));
     rs.throwIfStatusNotOK(message: 'Failed to search $query.');
     final body = rs.bodyAsMap;
-    final hitsMap = body['hits'] as Map<String, dynamic> ?? const {};
+    final hitsMap = body['hits'] as Map<String, dynamic>? ?? const {};
     final totalCount = _extractTotalCount(hitsMap);
     final results = _extractDocList(hitsMap);
-    final suggestMap = body['suggest'] as Map ?? const {};
-    final suggestHits = suggestMap.map<String, List<SuggestHit>>((k, v) {
-      if (v == null) return null;
-      final list = (v as List).cast<Map>();
-      final hits = list
-          .map((map) {
-            final optionsList = (map['options'] as List).cast<Map>();
-            final options = optionsList?.map((m) {
-              return SuggestHitOption(
-                m['text'] as String,
-                m['score'] as double,
-                freq: m['freq'] as int,
-                highlighted: m['highlighted'] as String,
-              );
-            })?.toList();
-            return SuggestHit(
-              map['text'] as String,
-              map['offset'] as int,
-              map['length'] as int,
-              options,
-            );
-          })
-          .where((x) => x != null)
-          .toList();
+    final suggestMap = body['suggest'] as Map? ?? const {};
+    final suggestEntries =
+        suggestMap.entries.where((e) => e.value != null).map((e) {
+      final list = (e.value as List).cast<Map>();
+      final hits = list.map((map) {
+        final optionsList = (map['options'] as List).cast<Map>();
+        final options = optionsList.map((m) {
+          return SuggestHitOption(
+            m['text'] as String,
+            m['score'] as double,
+            freq: m['freq'] as int,
+            highlighted: m['highlighted'] as String,
+          );
+        }).toList();
+        return SuggestHit(
+          map['text'] as String,
+          map['offset'] as int,
+          map['length'] as int,
+          options,
+        );
+      }).toList();
       return MapEntry('', hits);
     });
-    suggestHits.removeWhere((k, v) => v == null);
+    final suggestHits = Map.fromEntries(suggestEntries);
 
-    final aggMap = body['aggregations'] as Map<String, dynamic> ?? const {};
+    final aggMap = body['aggregations'] as Map<String, dynamic>? ?? const {};
     final aggResult = aggMap.map<String, Aggregation>((k, v) {
-      final agg = Aggregation(k, aggregations[k] as Map<String, dynamic>,
+      final agg = Aggregation(k, aggregations![k] as Map<String, dynamic>,
           v as Map<String, dynamic>);
       return MapEntry(k, agg);
     });
@@ -352,14 +349,14 @@ class Client {
       results,
       suggestHits: suggestHits.isEmpty ? null : suggestHits,
       aggregations: aggResult.isEmpty ? null : aggResult,
-      scrollId: body['_scroll_id'] as String,
+      scrollId: body['_scroll_id'] as String?,
     );
   }
 
   /// Continue search using the scroll API.
   Future<SearchResult> scroll({
-    @required String scrollId,
-    @required Duration duration,
+    required String scrollId,
+    required Duration duration,
   }) async {
     final path = ['_search', 'scroll'];
     final bodyMap = {
@@ -369,7 +366,7 @@ class Client {
     final rs = await _transport.send(Request('GET', path, bodyMap: bodyMap));
     rs.throwIfStatusNotOK(message: 'Failed to search scroll.');
     final body = rs.bodyAsMap;
-    final hitsMap = body['hits'] as Map<String, dynamic> ?? const {};
+    final hitsMap = body['hits'] as Map<String, dynamic>? ?? const {};
     final totalCount = _extractTotalCount(hitsMap);
     final results = _extractDocList(hitsMap);
 
@@ -381,12 +378,12 @@ class Client {
   }
 
   /// Clear scroll ids.
-  Future<ClearScrollResult> clearScrollId({@required String scrollId}) =>
+  Future<ClearScrollResult> clearScrollId({required String scrollId}) =>
       clearScrollIds(scrollIds: [scrollId]);
 
   /// Clear scroll ids.
   Future<ClearScrollResult> clearScrollIds(
-      {@required List<String> scrollIds}) async {
+      {required List<String> scrollIds}) async {
     final path = ['_search', 'scroll'];
     final bodyMap = {'scroll_id': scrollIds};
     final rs = await _transport.send(Request('DELETE', path, bodyMap: bodyMap));
@@ -395,7 +392,7 @@ class Client {
     }
     final body = rs.bodyAsMap;
     return ClearScrollResult(
-        body['succeeded'] as bool ?? false, body['num_freed'] as int ?? 0);
+        body['succeeded'] as bool? ?? false, body['num_freed'] as int? ?? 0);
   }
 
   int _extractTotalCount(Map<String, dynamic> hitsMap) {
@@ -404,21 +401,21 @@ class Client {
     if (hitsTotal is int) {
       totalCount = hitsTotal;
     } else if (hitsTotal is Map) {
-      totalCount = (hitsTotal['value'] as int) ?? 0;
+      totalCount = hitsTotal['value'] as int? ?? 0;
     }
     return totalCount;
   }
 
   List<Hit> _extractDocList(Map<String, dynamic> hitsMap) {
-    final hitsList = (hitsMap['hits'] as List).cast<Map>() ?? const <Map>[];
+    final hitsList = (hitsMap['hits'] as List?)?.cast<Map>() ?? const <Map>[];
     final results = hitsList
         .map((Map map) => Hit(
               map['_id'] as String,
               map['_source'] as Map,
-              index: map['_index'] as String,
-              type: map['_type'] as String,
-              score: map['_score'] as double,
-              sort: map['sort'] as List<dynamic>,
+              index: map['_index'] as String?,
+              type: map['_type'] as String?,
+              score: map['_score'] as double?,
+              sort: map['sort'] as List<dynamic>?,
               fields: _extractFields(map['fields']),
               highlight: _extractHighlight(map['highlight']),
             ))
@@ -426,7 +423,7 @@ class Client {
     return results;
   }
 
-  Map<String, List<dynamic>> _extractFields(value) {
+  Map<String, List<dynamic>>? _extractFields(value) {
     if (value == null) return null;
 
     if (value is Map<String, dynamic>) {
@@ -446,9 +443,10 @@ class Client {
       });
       return fields;
     }
-    throw FormatException('Unknown format for fields value: $value');  }
+    throw FormatException('Unknown format for fields value: $value');
+  }
 
-  Map<String, List<String>> _extractHighlight(value) {
+  Map<String, List<String>>? _extractHighlight(value) {
     if (value == null) return null;
     if (value is Map<String, dynamic>) {
       final highlights = <String, List<String>>{};
