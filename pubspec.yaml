@@ -4,13 +4,16 @@ description: >
   ElasticSearch is a full-text search engine based on Lucene.
 version: 0.3.0-null-safety.1
 homepage: https://github.com/isoos/elastic_client
+publish_to: none
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   http: ^0.13.0
-  http_client: ^1.5.0
+  http_client:
+    git:
+      url: https://github.com/uttusharma/http_client.git
   meta: ^1.0.0
 
 dev_dependencies:
