@@ -1,3 +1,7 @@
+## 0.3.0
+
+- Updated dependency, finalizing release.
+
 ## 0.3.0-null-safety.1
 
 - Migrated to null safety.
