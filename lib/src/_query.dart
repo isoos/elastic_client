@@ -71,4 +71,8 @@ abstract class Query {
       },
     };
   }
+
+  static Map ids(List<String> values) => {
+        'ids': {'values': values}
+      };
 }
