@@ -129,9 +129,9 @@ class Aggregation {
   Aggregation(String name, Map<String, dynamic> param, Map<String, dynamic> m) {
     this.name = name;
     value = m['value'];
-    values = m['values'] as Map;
-    docCountErrorUpperBound = m['doc_count_error_upper_bound'] as int;
-    sumOtherDocCount = m['sum_other_doc_count'] as int;
+    values = m['values'] as Map?;
+    docCountErrorUpperBound = m['doc_count_error_upper_bound'] as int?;
+    sumOtherDocCount = m['sum_other_doc_count'] as int?;
 
     final hitsMap = m['hits'] ?? const {};
     final hitsList = (hitsMap['hits'] as List?)?.cast<Map>() ?? const <Map>[];
