@@ -1,3 +1,8 @@
+## 0.3.1
+
+- Query support for ids. ([#40](https://github.com/isoos/elastic_client/pull/40) by [Cronos87](https://github.com/Cronos87)).
+- Allowing null in cast for aggregates. ([#42](https://github.com/isoos/elastic_client/pull/42) by [fpause](https://github.com/fpause)).
+
 ## 0.3.0
 
 - Updated dependency, finalizing release.
