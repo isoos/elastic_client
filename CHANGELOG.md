@@ -1,3 +1,9 @@
+## 0.3.2
+
+- `Client.count` and `Index.count`:
+  - Added method to count the total items of an index. ([#46](https://github.com/isoos/elastic_client/pull/46) by [Cronos87](https://github.com/Cronos87)).
+
+
 ## 0.3.1
 
 - Query support for ids. ([#40](https://github.com/isoos/elastic_client/pull/40) by [Cronos87](https://github.com/Cronos87)).
