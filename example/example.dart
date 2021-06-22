@@ -47,6 +47,13 @@ Future<void> main() async {
       ]);
   print(rs2.toMap());
 
+  // Search by ids.
+  final rs3 = await client.search(
+    index: 'my_index',
+    query: Query.ids(['1', '2', '3']),
+  );
+  print(rs3.toMap());
+
   await client.addAlias(index: 'my_index', alias: 'my_index_alias');
   await client.updateDoc(
     index: 'my_second_index',
@@ -59,6 +66,10 @@ Future<void> main() async {
   final aliases = await client.getAliases(aliases: ['my_index_*']);
   print(aliases.map((e) => {'alias': e.alias, 'index': e.index}));
   await client.removeAlias(index: 'my_second_index', alias: 'my_index_alias');
+
+  // Count the total items of an index.
+  final total = await client.count(index: 'my_index');
+  print(total);
 
   await transport.close();
 }
