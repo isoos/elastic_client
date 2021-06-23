@@ -11,6 +11,9 @@ class IndexRef {
   /// Returns weather the index exists.
   Future<bool> exists() => _client.indexExists(index: name);
 
+  /// Count the total items.
+  Future<int> count() => _client.count(index: name);
+
   /// Updates index definition with [content].
   Future<void> update({
     Map<String, dynamic>? content,

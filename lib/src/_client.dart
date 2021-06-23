@@ -395,6 +395,20 @@ class Client {
         body['succeeded'] as bool? ?? false, body['num_freed'] as int? ?? 0);
   }
 
+  /// Count the total items for the given [index].
+  Future<int> count({required String index}) async {
+    final rs = await _transport.send(
+      Request(
+        'GET',
+        ['_count'],
+        params: {'format': 'json'},
+      ),
+    );
+    rs.throwIfStatusNotOK(message: 'Unable to count the total of items.');
+    final body = rs.bodyAsMap;
+    return body['count'] as int;
+  }
+
   int _extractTotalCount(Map<String, dynamic> hitsMap) {
     final hitsTotal = hitsMap['total'];
     var totalCount = 0;
