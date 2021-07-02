@@ -282,6 +282,7 @@ class Client {
     Duration? scroll,
     HighlightOptions? highlight,
     bool? trackTotalHits,
+    int? size,
   }) async {
     final path = [
       if (index != null) index,
@@ -300,6 +301,7 @@ class Client {
       if (aggregations != null) 'aggregations': aggregations,
       if (highlight != null) 'highlight': highlight.toMap(),
       if (trackTotalHits != null) 'track_total_hits': trackTotalHits,
+      if (size != null) 'size': size,
     };
     final params = {
       'search_type': 'dfs_query_then_fetch',

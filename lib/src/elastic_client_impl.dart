@@ -110,6 +110,7 @@ class Aggregation {
   Map? values;
   int? docCountErrorUpperBound;
   int? sumOtherDocCount;
+  int? docCount;
   List<Doc>? hits;
   List<Bucket>? buckets;
 
@@ -121,6 +122,7 @@ class Aggregation {
       if (docCountErrorUpperBound != null)
         'docCountErrorUpperBound': docCountErrorUpperBound,
       if (sumOtherDocCount != null) 'sumOtherDocCount': sumOtherDocCount,
+      if (docCount != null) 'docCount': docCount,
       if (hits != null) 'hits': hits!.map((i) => i.toMap()).toList(),
       if (buckets != null) 'buckets': buckets!.map((i) => i.toMap()).toList(),
     };
@@ -132,6 +134,7 @@ class Aggregation {
     values = m['values'] as Map?;
     docCountErrorUpperBound = m['doc_count_error_upper_bound'] as int?;
     sumOtherDocCount = m['sum_other_doc_count'] as int?;
+    docCount = m['doc_count'] as int?;
 
     final hitsMap = m['hits'] ?? const {};
     final hitsList = (hitsMap['hits'] as List?)?.cast<Map>() ?? const <Map>[];
