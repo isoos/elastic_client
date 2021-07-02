@@ -1,3 +1,8 @@
+## 0.3.3
+
+- Added `docCount` property on aggregations. ([#47](https://github.com/isoos/elastic_client/pull/47) by [Cronos87](https://github.com/Cronos87)).
+- Added `size` option to search. ([#47](https://github.com/isoos/elastic_client/pull/47) by [Cronos87](https://github.com/Cronos87)).
+
 ## 0.3.2
 
 - `Client.count` and `Index.count`:
