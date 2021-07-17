@@ -1,8 +1,8 @@
 ## 0.3.4
 
 - `Client.minScore` and `Index.minScore`:
-  - Added method to filter results using a minimum score. ([#49](https://github.com/isoos/elastic_client/pull/47) by [Cronos87](https://github.com/Cronos87)).
-- Added missing `size` property in `Index`. ([#49](https://github.com/isoos/elastic_client/pull/47) by [Cronos87](https://github.com/Cronos87)).
+  - Added method to filter results using a minimum score. ([#49](https://github.com/isoos/elastic_client/pull/49) by [Cronos87](https://github.com/Cronos87)).
+- Added missing `size` property in `Index`. ([#49](https://github.com/isoos/elastic_client/pull/49) by [Cronos87](https://github.com/Cronos87)).
 
 ## 0.3.3
 
