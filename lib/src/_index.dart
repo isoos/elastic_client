@@ -103,6 +103,8 @@ class IndexRef {
     Duration? scroll,
     HighlightOptions? highlight,
     bool? trackTotalHits,
+    int? size,
+    double? minScore,
   }) async {
     return await _client.search(
       index: name,
@@ -118,6 +120,8 @@ class IndexRef {
       scroll: scroll,
       highlight: highlight,
       trackTotalHits: trackTotalHits,
+      size: size,
+      minScore: minScore,
     );
   }
 
