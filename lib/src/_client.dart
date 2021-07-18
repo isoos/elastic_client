@@ -272,7 +272,9 @@ class Client {
     String? index,
     String? type,
     Map? query,
+    // TODO: investigate if/when this should be deprecated in favour of `from`
     int? offset,
+    // TODO: investigate if/when this should be deprecated in favour of `size`
     int? limit,
     List<Object>? fields,
     dynamic source,
