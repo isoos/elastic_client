@@ -75,4 +75,16 @@ abstract class Query {
   static Map ids(List<String> values) => {
         'ids': {'values': values}
       };
+
+  static Map functionScore({
+    required dynamic query,
+    dynamic scriptScore,
+  }) {
+    return {
+      'function_score': {
+        'query': query,
+        if (scriptScore != null) 'script_score': scriptScore,
+      }
+    };
+  }
 }
