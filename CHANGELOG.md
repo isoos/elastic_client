@@ -1,3 +1,7 @@
+## 0.3.5
+
+- Added the very basics of `Function score query` to `Query` with the function `functionScore`. ([#50](https://github.com/isoos/elastic_client/pull/50) by [Cronos87](https://github.com/Cronos87))
+
 ## 0.3.4
 
 - `Client.minScore` and `Index.minScore`:
