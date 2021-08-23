@@ -1,3 +1,8 @@
+## 0.3.6
+
+- Supporting [Regexp query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html)
+  - Added `regexp` method on [_query.dart](lib/src/_query.dart)
+
 ## 0.3.5
 
 - Added the very basics of `Function score query` to `Query` with the function `functionScore`. ([#50](https://github.com/isoos/elastic_client/pull/50) by [Cronos87](https://github.com/Cronos87))
