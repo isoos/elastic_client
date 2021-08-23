@@ -1,7 +1,6 @@
 ## 0.3.6
 
-- Supporting [Regexp query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html)
-  - Added `regexp` method on [_query.dart](https://github.com/isoos/elastic_client/blob/master/lib/src/_query.dart)
+- Added `Query.regexp` method to support [regexp query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html). ([#52](https://github.com/isoos/elastic_client/pull/52) by [sota1235](https://github.com/sota1235))
 
 ## 0.3.5
 
