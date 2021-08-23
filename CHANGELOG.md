@@ -1,3 +1,7 @@
+## 0.3.6
+
+- Added `Query.regexp` method to support [regexp query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html). ([#52](https://github.com/isoos/elastic_client/pull/52) by [sota1235](https://github.com/sota1235))
+
 ## 0.3.5
 
 - Added the very basics of `Function score query` to `Query` with the function `functionScore`. ([#50](https://github.com/isoos/elastic_client/pull/50) by [Cronos87](https://github.com/Cronos87))

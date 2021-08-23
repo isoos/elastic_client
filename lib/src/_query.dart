@@ -72,6 +72,27 @@ abstract class Query {
     };
   }
 
+  static Map regexp(
+    String field,
+    String value, {
+    String? flags,
+    dynamic caseInsensitive,
+    int? maxDeterminizedStates,
+    String? rewrite,
+  }) {
+    return {
+      'regexp': {
+        field: {
+          'value': value,
+          if (flags != null) 'flags': flags,
+          if (caseInsensitive != null) 'case_insensitive': caseInsensitive,
+          if (maxDeterminizedStates != null) 'max_determinized_states': maxDeterminizedStates,
+          if (rewrite != null) 'rewrite': rewrite,
+        },
+      },
+    };
+  }
+
   static Map ids(List<String> values) => {
         'ids': {'values': values}
       };
