@@ -44,6 +44,18 @@ abstract class Query {
     };
   }
 
+  static Map matchPhrase(String field, String text, {String? analyzer, String? zeroTermsQuery}) {
+    return {
+      'match_phrase': {
+        field: {
+          'query': text,
+          if (analyzer != null) 'analyzer': analyzer,
+          if (zeroTermsQuery != null) 'zero_terms_query': zeroTermsQuery,
+        }
+      },
+    };
+  }
+
   static Map queryString(String query, {String? defaultField}) {
     return {
       'query_string': {

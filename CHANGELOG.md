@@ -1,3 +1,8 @@
+## 0.3.7
+
+- Added `Query.matchPhrase` method to support [match_phrase query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html).
+  ([#54](https://github.com/isoos/elastic_client/pull/54) by [sota1235](https://github.com/sota1235))
+
 ## 0.3.6
 
 - Added `Query.regexp` method to support [regexp query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html). ([#52](https://github.com/isoos/elastic_client/pull/52) by [sota1235](https://github.com/sota1235))
