@@ -44,7 +44,8 @@ abstract class Query {
     };
   }
 
-  static Map matchPhrase(String field, String text, {String? analyzer, String? zeroTermsQuery}) {
+  static Map matchPhrase(String field, String text,
+      {String? analyzer, String? zeroTermsQuery}) {
     return {
       'match_phrase': {
         field: {
@@ -98,7 +99,8 @@ abstract class Query {
           'value': value,
           if (flags != null) 'flags': flags,
           if (caseInsensitive != null) 'case_insensitive': caseInsensitive,
-          if (maxDeterminizedStates != null) 'max_determinized_states': maxDeterminizedStates,
+          if (maxDeterminizedStates != null)
+            'max_determinized_states': maxDeterminizedStates,
           if (rewrite != null) 'rewrite': rewrite,
         },
       },
