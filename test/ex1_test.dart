@@ -73,6 +73,47 @@ void main() {
       expect(rs.hits.single.id, 'id-1');
     });
 
+    test('count', () async {
+      final index = client.index(name: 'test-count');
+      await index.update(
+        content: {
+          'settings': {
+            'index': {
+              'number_of_shards': 1,
+              'number_of_replicas': 0,
+            },
+          },
+          'mappings': {
+            'properties': {
+              'field1': {'type': 'text'},
+            },
+          },
+        },
+      );
+      expect(await index.exists(), isTrue);
+      await index.updateDoc(
+        id: 'id-1',
+        doc: {
+          'field1': 'abcd12',
+        },
+      );
+      await index.updateDoc(
+        id: 'id-2',
+        doc: {
+          'field1': 'efgb',
+        },
+      );
+      await index.flush();
+      await Future.delayed(Duration(seconds: 2));
+      expect(await index.count(), 2);
+      expect(
+          await index.count(
+              query: Query.bool(must: [
+            Query.term('field1', ['abcd12'])
+          ])),
+          1);
+    });
+
     tearDownAll(() async {
       await httpTransport?.close();
       await dp?.stop();

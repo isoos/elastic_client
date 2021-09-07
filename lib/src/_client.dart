@@ -403,11 +403,15 @@ class Client {
 
   /// Count the total items for the given [index].
   Future<int> count({required String index, Map? query}) async {
-    final rs = await _transport.send(
-      Request('GET', [index, '_count'],
-          params: {'format': 'json'},
-          bodyMap: {'query': query ?? Query.matchAll()}),
-    );
+    final bodyMap = {
+      if (query != null) 'query': query,
+    };
+    final rs = await _transport.send(Request(
+      'GET',
+      [index, '_count'],
+      params: {'format': 'json'},
+      bodyMap: bodyMap,
+    ));
     rs.throwIfStatusNotOK(message: 'Unable to count the total of items.');
     final body = rs.bodyAsMap;
     return body['count'] as int;
