@@ -12,7 +12,7 @@ class IndexRef {
   Future<bool> exists() => _client.indexExists(index: name);
 
   /// Count the total items.
-  Future<int> count() => _client.count(index: name);
+  Future<int> count({Map? query}) => _client.count(index: name, query: query);
 
   /// Updates index definition with [content].
   Future<void> update({
