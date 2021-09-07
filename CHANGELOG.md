@@ -1,3 +1,7 @@
+## 0.3.8
+
+- Support `query` parameter on `Client.count` method.
+
 ## 0.3.7
 
 - Added `Query.matchPhrase` method to support [match_phrase query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html).
