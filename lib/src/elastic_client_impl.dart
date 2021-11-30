@@ -204,5 +204,6 @@ class ClearScrollResult {
   final int numFreed;
   ClearScrollResult(this.succeeded, this.numFreed);
 
-  Map<String, dynamic> toMap() => {'succeeded': succeeded, 'numFreed': numFreed};
+  Map<String, dynamic> toMap() =>
+      {'succeeded': succeeded, 'numFreed': numFreed};
 }
