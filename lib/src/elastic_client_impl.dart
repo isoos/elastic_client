@@ -24,14 +24,14 @@ class Doc {
     this.sort,
   });
 
-  Map<String, Object> toMap() {
+  Map<String, dynamic> toMap() {
     return {
-      if (index != null) '_index': index!,
-      if (type != null) '_type': type!,
+      if (index != null) '_index': index,
+      if (type != null) '_type': type,
       '_id': id,
-      if (score != null) '_score': score!,
+      if (score != null) '_score': score,
       'doc': doc,
-      if (sort != null) 'sort': sort!,
+      if (sort != null) 'sort': sort,
     };
   }
 }
@@ -52,11 +52,11 @@ class Hit extends Doc {
   }) : super(id, doc, index: index, type: type, score: score, sort: sort);
 
   @override
-  Map<String, Object> toMap() {
+  Map<String, dynamic> toMap() {
     return {
       ...super.toMap(),
-      if (fields != null) 'fields': fields!,
-      if (highlight != null) 'highlight': highlight!,
+      if (fields != null) 'fields': fields,
+      if (highlight != null) 'highlight': highlight,
     };
   }
 }
@@ -71,7 +71,7 @@ class SearchResult {
   SearchResult(this.totalCount, this.hits,
       {this.suggestHits, this.aggregations, this.scrollId});
 
-  Map<String, Object> toMap() => {
+  Map<String, dynamic> toMap() => {
         'totalCount': totalCount,
         'hits': hits.map((h) => h.toMap()).toList(),
       };
@@ -101,7 +101,7 @@ class ElasticDocHit {
 
   ElasticDocHit(this.id, this.score);
 
-  Map<String, Object> toMap() => {'id': id, 'score': score};
+  Map<String, dynamic> toMap() => {'id': id, 'score': score};
 }
 
 class Aggregation {
@@ -114,15 +114,15 @@ class Aggregation {
   List<Doc>? hits;
   List<Bucket>? buckets;
 
-  Map<String, Object> toMap() {
+  Map<String, dynamic> toMap() {
     return {
-      if (name != null) 'name': name!,
-      if (value != null) 'value': value!,
-      if (values != null) 'values': values!,
+      if (name != null) 'name': name,
+      if (value != null) 'value': value,
+      if (values != null) 'values': values,
       if (docCountErrorUpperBound != null)
-        'docCountErrorUpperBound': docCountErrorUpperBound!,
-      if (sumOtherDocCount != null) 'sumOtherDocCount': sumOtherDocCount!,
-      if (docCount != null) 'docCount': docCount!,
+        'docCountErrorUpperBound': docCountErrorUpperBound,
+      if (sumOtherDocCount != null) 'sumOtherDocCount': sumOtherDocCount,
+      if (docCount != null) 'docCount': docCount,
       if (hits != null) 'hits': hits!.map((i) => i.toMap()).toList(),
       if (buckets != null) 'buckets': buckets!.map((i) => i.toMap()).toList(),
     };
@@ -173,10 +173,10 @@ class Bucket {
   int? docCount;
   Map<String, Aggregation>? aggregations;
 
-  Map<String, Object> toMap() {
+  Map<String, dynamic> toMap() {
     return {
-      if (key != null) 'key': key!,
-      if (docCount != null) 'docCount': docCount!,
+      if (key != null) 'key': key,
+      if (docCount != null) 'docCount': docCount,
       if (aggregations != null)
         'aggregations': aggregations!.map((k, v) => MapEntry(k, v.toMap())),
     };
@@ -204,5 +204,5 @@ class ClearScrollResult {
   final int numFreed;
   ClearScrollResult(this.succeeded, this.numFreed);
 
-  Map<String, Object> toMap() => {'succeeded': succeeded, 'numFreed': numFreed};
+  Map<String, dynamic> toMap() => {'succeeded': succeeded, 'numFreed': numFreed};
 }
