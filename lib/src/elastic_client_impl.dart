@@ -24,7 +24,7 @@ class Doc {
     this.sort,
   });
 
-  Map toMap() {
+  Map<String, dynamic> toMap() {
     return {
       if (index != null) '_index': index,
       if (type != null) '_type': type,
@@ -52,7 +52,7 @@ class Hit extends Doc {
   }) : super(id, doc, index: index, type: type, score: score, sort: sort);
 
   @override
-  Map toMap() {
+  Map<String, dynamic> toMap() {
     return {
       ...super.toMap(),
       if (fields != null) 'fields': fields,
@@ -71,7 +71,7 @@ class SearchResult {
   SearchResult(this.totalCount, this.hits,
       {this.suggestHits, this.aggregations, this.scrollId});
 
-  Map toMap() => {
+  Map<String, dynamic> toMap() => {
         'totalCount': totalCount,
         'hits': hits.map((h) => h.toMap()).toList(),
       };
@@ -101,12 +101,12 @@ class ElasticDocHit {
 
   ElasticDocHit(this.id, this.score);
 
-  Map toMap() => {'id': id, 'score': score};
+  Map<String, dynamic> toMap() => {'id': id, 'score': score};
 }
 
 class Aggregation {
   String? name;
-  dynamic value;
+  Object? value;
   Map? values;
   int? docCountErrorUpperBound;
   int? sumOtherDocCount;
@@ -114,7 +114,7 @@ class Aggregation {
   List<Doc>? hits;
   List<Bucket>? buckets;
 
-  Map toMap() {
+  Map<String, dynamic> toMap() {
     return {
       if (name != null) 'name': name,
       if (value != null) 'value': value,
@@ -169,11 +169,11 @@ class Aggregation {
 }
 
 class Bucket {
-  dynamic key;
+  Object? key;
   int? docCount;
   Map<String, Aggregation>? aggregations;
 
-  Map toMap() {
+  Map<String, dynamic> toMap() {
     return {
       if (key != null) 'key': key,
       if (docCount != null) 'docCount': docCount,
@@ -204,5 +204,5 @@ class ClearScrollResult {
   final int numFreed;
   ClearScrollResult(this.succeeded, this.numFreed);
 
-  Map toMap() => {'succeeded': succeeded, 'numFreed': numFreed};
+  Map<String, dynamic> toMap() => {'succeeded': succeeded, 'numFreed': numFreed};
 }

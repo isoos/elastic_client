@@ -1,3 +1,6 @@
+## 0.3.9
+- Added types to `toMap` functions ([#57](https://github.com/isoos/elastic_client/pull/57)) by [jodinathan](https://github.com/jodinathan)
+
 ## 0.3.8
 
 - Support `query` parameter on `Client.count` method. ([#55](https://github.com/isoos/elastic_client/pull/55) by [sota1235](https://github.com/sota1235))
