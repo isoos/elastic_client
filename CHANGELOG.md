@@ -1,3 +1,6 @@
+## 0.3.10
+- The `freq` parameter in the suggestion may be null. ([#61](https://github.com/isoos/elastic_client/pull/61) by [Vi-cs](https://github.com/Vi-cs))
+
 ## 0.3.9
 - Added types to `toMap` functions ([#57](https://github.com/isoos/elastic_client/pull/57)) by [jodinathan](https://github.com/jodinathan)
 
