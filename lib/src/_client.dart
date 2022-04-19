@@ -328,7 +328,7 @@ class Client {
           return SuggestHitOption(
             m['text'] as String,
             m['score'] as double,
-            freq: m['freq'] as int,
+            freq: m['freq'] ?? -1 as int,
             highlighted: m['highlighted'] as String,
           );
         }).toList();
