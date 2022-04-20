@@ -359,6 +359,39 @@ class Client {
     );
   }
 
+  /// Discover terms in the index that match a partial String
+  Future<TermEnumResult> termEnum({
+    String? index,
+    String? type,
+    required String field,
+    String? string,
+    bool? caseInsensitive,
+    int? size,
+  }) async {
+    final path = [
+      if (index != null) index,
+      if (type != null) type,
+      '_term_enum',
+    ];
+
+    final map = {
+      'field': field ,
+      if (string != null) 'string': string,
+      if (caseInsensitive != null) 'case_insensitive': caseInsensitive,
+      if (size != null) 'size': size,
+    };
+    final rs = await _transport
+        .send(Request('POST', path, bodyMap: map));
+    rs.throwIfStatusNotOK(message: 'Failed to retrieve term enum for $field.');
+    final body = rs.bodyAsMap;
+
+    final termsResults = body['terms'] as List<String>? ?? const [];
+
+    return TermEnumResult(
+        termsResults
+    );
+  }
+
   /// Continue search using the scroll API.
   Future<SearchResult> scroll({
     required String scrollId,

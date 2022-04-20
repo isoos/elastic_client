@@ -207,3 +207,9 @@ class ClearScrollResult {
   Map<String, dynamic> toMap() =>
       {'succeeded': succeeded, 'numFreed': numFreed};
 }
+
+class TermEnumResult {
+  final List<String> terms;
+
+  TermEnumResult(this.terms);
+}
