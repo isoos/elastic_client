@@ -371,7 +371,7 @@ class Client {
     final path = [
       if (index != null) index,
       if (type != null) type,
-      '_term_enum',
+      '_terms_enum',
     ];
 
     final map = {
@@ -385,7 +385,8 @@ class Client {
     rs.throwIfStatusNotOK(message: 'Failed to retrieve term enum for $field.');
     final body = rs.bodyAsMap;
 
-    final termsResults = body['terms'] as List<String>? ?? const [];
+    final termsEntries = body['terms'] as List<dynamic>? ?? const [];
+    final termsResults = termsEntries.map((e) => e as String).toList();
 
     return TermEnumResult(
         termsResults
