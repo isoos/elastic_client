@@ -328,7 +328,7 @@ class Client {
           return SuggestHitOption(
             m['text'] as String,
             m['score'] as double,
-            freq: m['freq'] ?? -1 as int,
+            freq: (m['freq'] ?? -1) as int,
             highlighted: m['highlighted'] as String,
           );
         }).toList();
@@ -356,6 +356,40 @@ class Client {
       suggestHits: suggestHits.isEmpty ? null : suggestHits,
       aggregations: aggResult.isEmpty ? null : aggResult,
       scrollId: body['_scroll_id'] as String?,
+    );
+  }
+
+  /// Discover terms in the index that match a partial String
+  /// https://www.elastic.co/guide/en/elasticsearch/reference/8.1/search-terms-enum.html
+  Future<TermsEnumResult> termsEnum({
+    String? index,
+    String? type,
+    required String field,
+    String? string,
+    bool? caseInsensitive,
+    int? size,
+  }) async {
+    final path = [
+      if (index != null) index,
+      if (type != null) type,
+      '_terms_enum',
+    ];
+
+    final map = {
+      'field': field ,
+      if (string != null) 'string': string,
+      if (caseInsensitive != null) 'case_insensitive': caseInsensitive,
+      if (size != null) 'size': size,
+    };
+    final rs = await _transport
+        .send(Request('POST', path, bodyMap: map));
+    rs.throwIfStatusNotOK(message: 'Failed to retrieve term enum for $field.');
+    final body = rs.bodyAsMap;
+
+    final termsResults = (body['terms']?.whereType<String>()?.toList() ?? <String>[]) as List<String> ;
+
+    return TermsEnumResult(
+        termsResults
     );
   }
 

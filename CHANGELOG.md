@@ -1,3 +1,6 @@
+## 0.3.11
+- Added support for term enum ([#62](https://github.com/isoos/elastic_client/pull/62) by [Vi-cs](https://github.com/Vi-cs))
+
 ## 0.3.10
 - The `freq` parameter in the suggestion response may be `null`, returns -1 in such cases. ([#61](https://github.com/isoos/elastic_client/pull/61) by [Vi-cs](https://github.com/Vi-cs))
 
