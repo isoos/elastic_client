@@ -328,7 +328,7 @@ class Client {
           return SuggestHitOption(
             m['text'] as String,
             m['score'] as double,
-            freq: m['freq'] ?? -1 as int,
+            freq: (m['freq'] ?? -1) as int,
             highlighted: m['highlighted'] as String,
           );
         }).toList();
@@ -385,8 +385,7 @@ class Client {
     rs.throwIfStatusNotOK(message: 'Failed to retrieve term enum for $field.');
     final body = rs.bodyAsMap;
 
-    final termsEntries = body['terms'] as List<dynamic>? ?? const [];
-    final termsResults = termsEntries.map((e) => e as String).toList();
+    final termsResults = (body['terms']?.whereType<String>()?.toList() ?? <String>[]) as List<String> ;
 
     return TermEnumResult(
         termsResults
