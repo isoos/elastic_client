@@ -208,8 +208,8 @@ class ClearScrollResult {
       {'succeeded': succeeded, 'numFreed': numFreed};
 }
 
-class TermEnumResult {
+class TermsEnumResult {
   final List<String> terms;
 
-  TermEnumResult(this.terms);
+  TermsEnumResult(this.terms);
 }

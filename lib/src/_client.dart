@@ -360,7 +360,8 @@ class Client {
   }
 
   /// Discover terms in the index that match a partial String
-  Future<TermEnumResult> termEnum({
+  /// https://www.elastic.co/guide/en/elasticsearch/reference/8.1/search-terms-enum.html
+  Future<TermsEnumResult> termsEnum({
     String? index,
     String? type,
     required String field,
@@ -387,7 +388,7 @@ class Client {
 
     final termsResults = (body['terms']?.whereType<String>()?.toList() ?? <String>[]) as List<String> ;
 
-    return TermEnumResult(
+    return TermsEnumResult(
         termsResults
     );
   }
