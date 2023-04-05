@@ -1,5 +1,6 @@
 ## 0.3.12
-- Added Elasticsearch warning response header information to `Response`
+- Added Elasticsearch warning response header information to `Response` ([#66](https://github.com/isoos/elastic_client/pull/66) by [wapa5pow](https://github.com/wapa5pow))
+- Fix deprecated field name: `mustNot` -> `must_not` ([#65](https://github.com/isoos/elastic_client/pull/65) by [swdyh](https://github.com/swdyh))
 
 ## 0.3.11
 - Added support for term enum ([#62](https://github.com/isoos/elastic_client/pull/62) by [Vi-cs](https://github.com/Vi-cs))
