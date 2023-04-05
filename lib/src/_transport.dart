@@ -63,11 +63,11 @@ class Response {
   Map<String, dynamic>? _bodyAsMap;
   List? _bodyAsList;
 
-  /// The HTTP headers of the response.
-  final Map<String, String> headers;
+  /// The warning extracted from the HTTP headers of the response.
+  final String? warning;
 
   /// Creates a new [Response] object.
-  Response(this.statusCode, this.body, this.headers);
+  Response(this.statusCode, this.body, {this.warning});
 
   /// Returns the body parsed as a [Map].
   Map<String, dynamic> get bodyAsMap =>

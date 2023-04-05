@@ -1,3 +1,6 @@
+## 0.3.12
+- Added Elasticsearch warning response header information to `Response`
+
 ## 0.3.11
 - Added support for term enum ([#62](https://github.com/isoos/elastic_client/pull/62) by [Vi-cs](https://github.com/Vi-cs))
 
