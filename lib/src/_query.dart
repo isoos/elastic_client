@@ -16,7 +16,7 @@ abstract class Query {
         if (must != null) 'must': must,
         if (filter != null) 'filter': filter,
         if (should != null) 'should': should,
-        if (mustNot != null) 'mustNot': mustNot,
+        if (mustNot != null) 'must_not': mustNot,
       }
     };
   }
