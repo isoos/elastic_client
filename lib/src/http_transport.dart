@@ -46,7 +46,7 @@ class HttpTransport implements Transport {
       rq.body = request.bodyText!;
     }
     final rs = await _httpClient.send(rq).timeout(_timeout);
-    return Response(rs.statusCode, await rs.stream.bytesToString());
+    return Response(rs.statusCode, await rs.stream.bytesToString(), rs.headers);
   }
 
   @override
