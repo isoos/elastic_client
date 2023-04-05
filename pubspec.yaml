@@ -2,11 +2,11 @@ name: elastic_client
 description: >
   Dart bindings for ElasticSearch HTTP API.
   ElasticSearch is a full-text search engine based on Lucene.
-version: 0.3.11
+version: 0.3.12
 homepage: https://github.com/isoos/elastic_client
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   http: ^0.13.0
