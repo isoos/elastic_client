@@ -1,3 +1,6 @@
+## 0.3.13
+- Made the `_score` field nullable in case it's not returned by the `top_hits` aggregation result.
+
 ## 0.3.12
 - Added Elasticsearch warning response header information to `Response` ([#66](https://github.com/isoos/elastic_client/pull/66) by [wapa5pow](https://github.com/wapa5pow))
 - Fix deprecated field name: `mustNot` -> `must_not` ([#65](https://github.com/isoos/elastic_client/pull/65) by [swdyh](https://github.com/swdyh))
