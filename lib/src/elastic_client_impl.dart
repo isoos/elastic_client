@@ -144,7 +144,7 @@ class Aggregation {
               map['_source'] as Map,
               index: map['_index'] as String,
               type: map['_type'] as String,
-              score: map['_score'] != null ? map['_score'] as double : 0.0,
+              score: (map['_score'] as double?) ?? 0.0,
               sort: map['sort'] as List<dynamic>,
             ))
         .toList();
