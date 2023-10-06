@@ -1,3 +1,6 @@
+## 0.3.14
+- Update dependencies.
+
 ## 0.3.13
 - Made the `_score` field nullable in case it's not returned by the `top_hits` aggregation result. ([#68](https://github.com/isoos/elastic_client/pull/68) by [gvisniuc](https://github.com/gvisniuc))
 
