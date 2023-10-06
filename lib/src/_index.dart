@@ -107,6 +107,7 @@ class IndexRef {
     bool? trackTotalHits,
     int? size,
     double? minScore,
+    Map? knn,
   }) async {
     return await _client.search(
       index: name,
@@ -124,6 +125,7 @@ class IndexRef {
       trackTotalHits: trackTotalHits,
       size: size,
       minScore: minScore,
+      knn: knn,
     );
   }
 

@@ -286,6 +286,7 @@ class Client {
     bool? trackTotalHits,
     int? size,
     double? minScore,
+    Map? knn,
   }) async {
     final path = [
       if (index != null) index,
@@ -306,9 +307,10 @@ class Client {
       if (trackTotalHits != null) 'track_total_hits': trackTotalHits,
       if (size != null) 'size': size,
       if (minScore != null) 'min_score': minScore,
+      if (knn != null) 'knn': knn,
     };
     final params = {
-      'search_type': 'dfs_query_then_fetch',
+      if (knn == null) 'search_type': 'dfs_query_then_fetch',
       if (scroll != null) 'scroll': scroll.inSeconds.toString() + 's',
     };
     final rs = await _transport
