@@ -1,3 +1,7 @@
+## 0.3.15
+
+- Updated dependencies. ([#70](https://github.com/isoos/elastic_client/pull/70) by [SaadArdati](https://github.com/SaadArdati)).
+- 
 ## 0.3.14
 
 - Updated dependencies. ([#69](https://github.com/isoos/elastic_client/pull/69) by [SaadArdati](https://github.com/SaadArdati)).
