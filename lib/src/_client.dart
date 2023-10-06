@@ -310,6 +310,7 @@ class Client {
       if (knn != null) 'knn': knn,
     };
     final params = {
+      // search_type cannot be specified if knn is specified.
       if (knn == null) 'search_type': 'dfs_query_then_fetch',
       if (scroll != null) 'scroll': scroll.inSeconds.toString() + 's',
     };
